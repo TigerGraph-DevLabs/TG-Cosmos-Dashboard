@@ -1,0 +1,18 @@
+[
+    {
+      "id": 624748504,
+      "nickName": "MovieRecommender",
+      "host": "https://movie-recommender-3-6.i.tgcloud.io",
+      "graphName": "RatingMethod",
+      "userName": "Tigergraph",
+      "password": "123456"
+    },
+    {
+      "id": 624691229,
+      "nickName": "Airbnb",
+      "host": "https://airbnb.i.tgcloud.io",
+      "graphName": "Test",
+      "userName": "Tigergraph",
+      "password": "123456"
+    }
+]
