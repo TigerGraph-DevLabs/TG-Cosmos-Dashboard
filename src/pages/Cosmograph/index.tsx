@@ -7,6 +7,8 @@ import en_US from 'antd/lib/locale/en_US';
 import TextArea from 'antd/lib/input/TextArea';
 import type { ColumnsType } from 'antd/lib/table';
 import { SetStateAction, useState } from 'react';
+import { TigerGraphConnection } from './tigergraph';
+import { Graph, GraphConfigInterface } from "@cosmograph/cosmos";
 
 // **************** Connections ****************
 const { Option } = Select;
@@ -38,6 +40,8 @@ interface InstalledQueryType {
   body: string;
 }
 // *********************************************
+
+let conn = new TigerGraphConnection("", "", "", "");
 
 export default () => {
   
@@ -107,14 +111,35 @@ export default () => {
       setAllEdges(tempEdgesData);
     }
     
-    //Fullfill installedQuires with all installed quires, use name as reference (if there are better way change the type of installed quires)
-    console.log("Chaning options for installed queries");
-    if (host == "1"){
+    //Fullfill installedQueries with all installed queries, use name as reference (if there are better way change the type of installed queries)
+    console.log("Changing options for installed queries");
+    conn = new TigerGraphConnection(host, graphName, userName, password);
+
+    let doc = document.getElementById("wroteQuiresTextArea");
+    
+    // doc.innerHTML = `INTERPRET QUERY () FOR GRAPH ${graphName} {\n\n}`;
+    // doc.value = `INTERPRET QUERY () FOR GRAPH ${graphName} {\n\n}`;
+
+
+    conn.listQueries().then((arr) => {
+      console.log(arr);
       var tempInstalledQueryData = [];
-      tempInstalledQueryData.push({key: 1, name:"Installed Query 1", body:"SELECT SOMETHINE"})
-      tempInstalledQueryData.push({key: 2, name:"Installed Query 2", body:"SELECT SOMETHINE WHERE SOMETHINE"})
+      for (let i in arr) {        
+        tempInstalledQueryData.push({key: i, name: arr[i], body: arr[i]});
+      }
+
+
+      document.getElementById("wroteQuiresTextArea").value = "INTERPRET QUERY () FOR GRAPH "+graphName+" {<br><br>}";
+
       setInstalledQueryData(tempInstalledQueryData);
-    }
+    }).catch((err) => console.log(err));
+
+    // if (host == "1"){
+    //   var tempInstalledQueryData = [];
+    //   tempInstalledQueryData.push({key: 1, name:"Installed Query 1", body:"SELECT SOMETHINE"})
+    //   tempInstalledQueryData.push({key: 2, name:"Installed Query 2", body:"SELECT SOMETHINE WHERE SOMETHINE"})
+    //   setInstalledQueryData(tempInstalledQueryData);
+    // }
   };
   // *********************************************
 
@@ -181,6 +206,8 @@ export default () => {
   ];
   const chooseInstalledQuery = (gsql:string) => {
     console.log(gsql);
+
+    createGraphQuery(gsql);
   }
   // *********************************************
   
@@ -190,9 +217,89 @@ export default () => {
     //Get GSQL first and connect to backend with the GSQL
     var gsql: string;
     gsql = document.getElementById("wroteQuiresTextArea").value;
-    console.log(gsql);
+    console.log(document.getElementById("wroteQuiresTextArea").value);
+
+    createGraphQueryString(gsql);
+
   };
   // *********************************************
+
+  // ******** FUNCTIONS ***********************
+
+
+async function createGraph(v_array: Array<string>, e_array: Array<string>) {
+  conn.getTigerGraphData(v_array, e_array).then((x) => {
+    const type_to_colour : Map<string, string> = new Map();
+
+    for (let v in v_array) {
+      type_to_colour.set(v_array[v], 'rgb('+Math.round(Math.random()*255)+','+Math.round(Math.random()*255)+','+Math.round(Math.random()*255)+')');
+    }
+
+    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+    const config: GraphConfigInterface<InputNode, InputLink> = {
+      nodeColor: v => `${type_to_colour.get("" + v.v_type)}`,
+      linkArrows: false,
+      events: {
+        onClick: (node) => {
+          console.log("Clicked node: ", node);
+          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
+        }
+      }
+    };
+    const graph = new Graph(canvas, config);
+    graph.setData(x.nodes, x.links);
+    graph.zoom(0.9);
+});
+}
+
+async function createGraphQuery(query_name: string) {
+  conn.runInstalledQuery(query_name).then((x) => {
+    const type_to_colour : Map<string, string> = new Map();
+
+  //   for (let v in v_array) {
+  //     type_to_colour.set(v_array[v], 'rgb('+Math.round(Math.random()*255)+','+Math.round(Math.random()*255)+','+Math.round(Math.random()*255)+')');
+  //   }
+
+    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+    const config: GraphConfigInterface<InputNode, InputLink> = {
+      // nodeColor: v => `${type_to_colour.get("" + v.v_type)}`,
+      linkArrows: false,
+      events: {
+        onClick: (node) => {
+          console.log("Clicked node: ", node);
+          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
+        }
+      }
+    };
+    const graph = new Graph(canvas, config);
+    graph.setData(x.nodes, x.links);
+    graph.zoom(0.9);
+});
+}
+
+async function createGraphQueryString(query_string: string) {
+  conn.runInterpretedQuery(query_string).then((x) => {
+
+    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+    const config: GraphConfigInterface<InputNode, InputLink> = {
+      // nodeColor: v => `${type_to_colour.get("" + v.v_type)}`,
+      linkArrows: false,
+      events: {
+        onClick: (node) => {
+          console.log("Clicked node: ", node);
+          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
+        }
+      }
+    };
+    const graph = new Graph(canvas, config);
+    graph.setData(x.nodes, x.links);
+    graph.zoom(0.9);
+});
+}
+
+
+  // ******************************************
+
 
   return (
     <ConfigProvider locale={en_US}> 
@@ -279,11 +386,11 @@ export default () => {
             </ProCard>
             <br />
 
-            <ProCard title="Write Quires">
+            <ProCard title="Write Queries">
               <TextArea 
                 rows={4}
                 id = "wroteQuiresTextArea"
-                placeholder="Write GSQL quires and hit run button" />
+                placeholder="Write GSQL queries and hit run button"></TextArea>
               <br />
               <br />
               
@@ -305,13 +412,13 @@ export default () => {
           </Col>
 
           <Col span={14}>
-            <ProCard title="Cosmograph Visualization (Delete this title after complete)">
-              Put cosmograph render here
+            <ProCard title="Cosmograph Visualization">
+              <canvas width="1000" height="1000" style={{width: '100%', height: '750px'}}></canvas>
             </ProCard>
           </Col>
           <Col span={4}>
-            <ProCard title="Cosmograph info (Delete this title after complete)">
-              Put the infomation here
+            <ProCard title="Cosmograph info">
+              <p id = "node_info"></p>
             </ProCard>
           </Col>
         </Row>
