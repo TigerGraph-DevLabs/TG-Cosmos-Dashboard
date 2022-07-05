@@ -111,9 +111,15 @@ export default () => {
       setAllEdges(tempEdgesData);
     }
     
-    //Fullfill installedQuires with all installed quires, use name as reference (if there are better way change the type of installed quires)
-    console.log("Chaning options for installed queries");
+    //Fullfill installedQueries with all installed queries, use name as reference (if there are better way change the type of installed queries)
+    console.log("Changing options for installed queries");
     conn = new TigerGraphConnection(host, graphName, userName, password);
+
+    let doc = document.getElementById("wroteQuiresTextArea");
+    
+    // doc.innerHTML = `INTERPRET QUERY () FOR GRAPH ${graphName} {\n\n}`;
+    // doc.value = `INTERPRET QUERY () FOR GRAPH ${graphName} {\n\n}`;
+
 
     conn.listQueries().then((arr) => {
       console.log(arr);
@@ -121,8 +127,13 @@ export default () => {
       for (let i in arr) {        
         tempInstalledQueryData.push({key: i, name: arr[i], body: arr[i]});
       }
+
+
+      document.getElementById("wroteQuiresTextArea").value = "INTERPRET QUERY () FOR GRAPH "+graphName+" {<br><br>}";
+
       setInstalledQueryData(tempInstalledQueryData);
     }).catch((err) => console.log(err));
+
     // if (host == "1"){
     //   var tempInstalledQueryData = [];
     //   tempInstalledQueryData.push({key: 1, name:"Installed Query 1", body:"SELECT SOMETHINE"})
@@ -208,7 +219,7 @@ export default () => {
     gsql = document.getElementById("wroteQuiresTextArea").value;
     console.log(document.getElementById("wroteQuiresTextArea").value);
 
-    // createGraphQuery(gsql);
+    createGraphQueryString(gsql);
 
   };
   // *********************************************
@@ -372,11 +383,11 @@ async function createGraphQueryString(query_string: string) {
             </ProCard>
             <br />
 
-            <ProCard title="Write Quires">
+            <ProCard title="Write Queries">
               <TextArea 
                 rows={4}
                 id = "wroteQuiresTextArea"
-                placeholder="Write GSQL quires and hit run button" />
+                placeholder="Write GSQL queries and hit run button"></TextArea>
               <br />
               <br />
               
