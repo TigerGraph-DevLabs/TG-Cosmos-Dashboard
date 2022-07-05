@@ -242,6 +242,7 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
+          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
@@ -266,6 +267,7 @@ async function createGraphQuery(query_name: string) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
+          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
@@ -285,6 +287,7 @@ async function createGraphQueryString(query_string: string) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
+          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
@@ -409,13 +412,13 @@ async function createGraphQueryString(query_string: string) {
           </Col>
 
           <Col span={14}>
-            <ProCard title="Cosmograph Visualization (Delete this title after complete)">
+            <ProCard title="Cosmograph Visualization">
               <canvas width="1000" height="1000" style={{width: '100%', height: '750px'}}></canvas>
             </ProCard>
           </Col>
           <Col span={4}>
-            <ProCard title="Cosmograph info (Delete this title after complete)">
-              Put the infomation here
+            <ProCard title="Cosmograph info">
+              <p id = "node_info"></p>
             </ProCard>
           </Col>
         </Row>
