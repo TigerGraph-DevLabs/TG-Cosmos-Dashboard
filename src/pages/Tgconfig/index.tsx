@@ -1,6 +1,6 @@
 import { PageContainer, ProColumns } from '@ant-design/pro-components';
 import { EditableProTable, ProCard, ProFormField, ProFormRadio } from '@ant-design/pro-components';
-import { Button, Col, message, Row, Space } from 'antd';
+import { Button, Col, message, Row } from 'antd';
 import React, { useState } from 'react';
 import connectionData from '../../utils/connections.json'
 import { ConfigProvider } from 'antd';
