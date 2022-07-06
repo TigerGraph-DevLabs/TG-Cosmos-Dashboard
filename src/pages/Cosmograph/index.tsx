@@ -135,14 +135,25 @@ export default () => {
     console.log("Chaning options for installed queries");
     
 
+    let doc = document.getElementById("wroteQuiresTextArea");
+    
+    // doc.innerHTML = `INTERPRET QUERY () FOR GRAPH ${graphName} {\n\n}`;
+    // doc.value = `INTERPRET QUERY () FOR GRAPH ${graphName} {\n\n}`;
+
+
     conn.listQueries().then((arr) => {
       console.log(arr);
       var tempInstalledQueryData = [];
       for (let i in arr) {        
         tempInstalledQueryData.push({key: i, name: arr[i], body: arr[i]});
       }
+
+
+      document.getElementById("wroteQuiresTextArea").value = "INTERPRET QUERY () FOR GRAPH "+graphName+" {<br><br>}";
+
       setInstalledQueryData(tempInstalledQueryData);
     }).catch((err) => console.log(err));
+
     // if (host == "1"){
     //   var tempInstalledQueryData = [];
     //   tempInstalledQueryData.push({key: 1, name:"Installed Query 1", body:"SELECT SOMETHINE"})
@@ -152,8 +163,6 @@ export default () => {
   };
   // *********************************************
 
-  // ********* Store clicked Node ****************
-  const [clickedNode, setClickedNode] = useState<InputNode>();
 
   // ********* Choose Vertices and Edges *********
   const [allVerteices, setAllVerteices] = useState<VertexType[]>([]);
@@ -232,7 +241,7 @@ export default () => {
     gsql = document.getElementById("wroteQuiresTextArea").value;
     console.log(document.getElementById("wroteQuiresTextArea").value);
 
-    // createGraphQuery(gsql);
+    createGraphQueryString(gsql);
 
   };
   // *********************************************
@@ -254,8 +263,8 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
       linkArrows: false,
       events: {
         onClick: (node) => {
-          setClickedNode(node);
           console.log("Clicked node: ", node);
+          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
@@ -280,6 +289,7 @@ async function createGraphQuery(query_name: string) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
+          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
@@ -299,6 +309,7 @@ async function createGraphQueryString(query_string: string) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
+          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
@@ -397,11 +408,11 @@ async function createGraphQueryString(query_string: string) {
             </ProCard>
             <br />
 
-            <ProCard title="Write Quires">
+            <ProCard title="Write Queries">
               <TextArea 
                 rows={4}
                 id = "wroteQuiresTextArea"
-                placeholder="Write GSQL quires and hit run button" />
+                placeholder="Write GSQL queries and hit run button"></TextArea>
               <br />
               <br />
               
@@ -423,13 +434,13 @@ async function createGraphQueryString(query_string: string) {
           </Col>
 
           <Col span={14}>
-            <ProCard title="Cosmograph Visualization (Delete this title after complete)">
+            <ProCard title="Cosmograph Visualization">
               <canvas width="1000" height="1000" style={{width: '100%', height: '750px'}}></canvas>
             </ProCard>
           </Col>
           <Col span={4}>
-            <ProCard title="Cosmograph info (Delete this title after complete)">
-              {clickedNode?.id}
+            <ProCard title="Cosmograph info">
+              <p id = "node_info"></p>
             </ProCard>
           </Col>
         </Row>
