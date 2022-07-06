@@ -15,6 +15,8 @@ Ant Design Pro is a production-ready solution for enterprise applications as a R
 [Ant Design Pro](https://pro.ant.design/docs/getting-started/)
 
 ## Quick start
+> Note: your Node version MUST be 14 or above except 15 and 17.
+
 ### Set Up the FastAPI Server
 1. Create a virtual environment `python3 -m venv venv` and activate it `source venv/bin/activate/`
 2. Install the libraries: `pip install pyTigerGraph fastapi uvicorn`
