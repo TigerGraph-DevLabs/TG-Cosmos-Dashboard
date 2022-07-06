@@ -7,7 +7,7 @@ import en_US from 'antd/lib/locale/en_US';
 import TextArea from 'antd/lib/input/TextArea';
 import type { ColumnsType } from 'antd/lib/table';
 import { SetStateAction, useState } from 'react';
-import { TigerGraphConnection } from './tigergraph';
+import { TigerGraphConnection, InputLink, InputNode} from './tigergraph';
 import { Graph, GraphConfigInterface } from "@cosmograph/cosmos";
 
 // **************** Connections ****************
@@ -93,6 +93,9 @@ export default () => {
     setInstalledQueryData(tempEmpty);
     setAllVerteices(tempEmpty);
     setAllEdges(tempEmpty);
+
+    //make connection to tg cloud
+    conn = new TigerGraphConnection(host, graphName, userName, password);
     //Make Connections with TG Cloud and Get all type of verteices/edges and installed queries
     //Fullfill allVerteices with all type of vertices, push with CheckboxOption type
     //Fullfill allEdges with all type of edges, push with CheckboxOption type
@@ -110,10 +113,27 @@ export default () => {
       tempEdgesData.push({key: 2, name:"Edge 2"})
       setAllEdges(tempEdgesData);
     }
+
+    conn.listVertexEdgeTypes().then((data) => {
+      let edgeTypes = data.edges;
+      let vertexTypes = data.vertices;
+      var tempVerteicesData = [];
+      var tempEdgesData = [];
+
+      for(let i in edgeTypes){
+        tempEdgesData.push({key: edgeTypes[i], name: edgeTypes[i]});
+      }
+      for(let i in vertexTypes){
+        tempVerteicesData.push({key: vertexTypes[i], name: vertexTypes[i]})
+      }
+      setAllVerteices(tempVerteicesData);
+      setAllEdges(tempEdgesData);
+
+    });
     
     //Fullfill installedQuires with all installed quires, use name as reference (if there are better way change the type of installed quires)
     console.log("Chaning options for installed queries");
-    conn = new TigerGraphConnection(host, graphName, userName, password);
+    
 
     conn.listQueries().then((arr) => {
       console.log(arr);
@@ -132,6 +152,8 @@ export default () => {
   };
   // *********************************************
 
+  // ********* Store clicked Node ****************
+  const [clickedNode, setClickedNode] = useState<InputNode>();
 
   // ********* Choose Vertices and Edges *********
   const [allVerteices, setAllVerteices] = useState<VertexType[]>([]);
@@ -177,6 +199,8 @@ export default () => {
 
   const runSelectedVE = () =>{
     //Get all types of vertix in selectedVertices and all types of edge in selected Edges
+    console.log(selectedEdgesKeys, selectedVerteicesKeys)
+    createGraph(selectedVerteicesKeys, selectedEdgesKeys);
     console.log("Selected Verteices:", selectedVerteicesKeys);
     console.log("Selected Edges:", selectedEdgesKeys);
   };
@@ -230,6 +254,7 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
       linkArrows: false,
       events: {
         onClick: (node) => {
+          setClickedNode(node);
           console.log("Clicked node: ", node);
         }
       }
@@ -404,7 +429,7 @@ async function createGraphQueryString(query_string: string) {
           </Col>
           <Col span={4}>
             <ProCard title="Cosmograph info (Delete this title after complete)">
-              Put the infomation here
+              {clickedNode?.id}
             </ProCard>
           </Col>
         </Row>
