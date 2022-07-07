@@ -1,12 +1,11 @@
-import { PageContainer, ProCard, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, Cascader, Checkbox, Col, Divider, Row, Select, Space, Table } from 'antd';
-import type { CheckboxValueType } from 'antd/es/checkbox/Group';
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { Button, Col, Row, Select, Table } from 'antd';
 import connectionData from '../../utils/connections.json'
 import { ConfigProvider } from 'antd';
 import en_US from 'antd/lib/locale/en_US';
 import TextArea from 'antd/lib/input/TextArea';
 import type { ColumnsType } from 'antd/lib/table';
-import { SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { TigerGraphConnection, InputLink, InputNode} from './tigergraph';
 import { Graph, GraphConfigInterface } from "@cosmograph/cosmos";
 
@@ -51,9 +50,9 @@ export default () => {
     console.log('search:', value);
   };
 
-  const clearInterpretedError = () => document.getElementById("error_interpreted").innerHTML = "";
-  const clearInstalledError = () => document.getElementById("error_installed").innerHTML = "";
-  const clearVertexError = () => document.getElementById("error_vertices").innerHTML = "";
+  const clearInterpretedError = () => (document.getElementById("error_interpreted") as HTMLElement).innerHTML = "";
+  const clearInstalledError = () => (document.getElementById("error_installed") as HTMLElement).innerHTML = "";
+  const clearVertexError = () => (document.getElementById("error_vertices") as HTMLElement).innerHTML = "";
 
   const onChangeConnections = (index: any) => {
     clearInterpretedError();
@@ -62,11 +61,6 @@ export default () => {
     //When user change the options for connections
     connectionIndex = index;
     console.log(`selected ${index}`);
-  //Try make a connection here and give feedback on message
-  //   const host:string = connectionData[index].host;
-  //   const graphName:string = connectionData[index].graphName;
-  //   const userName:string = connectionData[index].userName;
-  //   const password:string = connectionData[index].password;
     testConnection(connectionData[index].host,
       connectionData[index].graphName,
       connectionData[index].userName,
@@ -95,12 +89,12 @@ export default () => {
     //Fullfill allEdges with all type of edges, push with CheckboxOption type
     console.log("Chaning options for Vertices and Edges");
     if (host == "1"){
-      var tempVerteicesData = [];
-      tempVerteicesData.push({key: 1, name:"Vertex 1"})
-      tempVerteicesData.push({key: 2, name:"Vertex 2"})
-      tempVerteicesData.push({key: 3, name:"Vertex 3"})
-      tempVerteicesData.push({key: 4, name:"Vertex 4"})
-      setAllVerteices(tempVerteicesData);
+      var tempVerticesData = [];
+      tempVerticesData.push({key: 1, name:"Vertex 1"})
+      tempVerticesData.push({key: 2, name:"Vertex 2"})
+      tempVerticesData.push({key: 3, name:"Vertex 3"})
+      tempVerticesData.push({key: 4, name:"Vertex 4"})
+      setAllVerteices(tempVerticesData);
 
       var tempEdgesData = [];
       tempEdgesData.push({key: 1, name:"Edge 1"})
@@ -111,29 +105,22 @@ export default () => {
     conn.listVertexEdgeTypes().then((data) => {
       let edgeTypes = data.edges;
       let vertexTypes = data.vertices;
-      var tempVerteicesData = [];
-      var tempEdgesData = [];
+      var tempVertexData = [];
+      var tempEdgeData = [];
 
       for(let i in edgeTypes){
-        tempEdgesData.push({key: edgeTypes[i], name: edgeTypes[i]});
+        tempEdgeData.push({key: edgeTypes[i], name: edgeTypes[i]});
       }
       for(let i in vertexTypes){
-        tempVerteicesData.push({key: vertexTypes[i], name: vertexTypes[i]})
+        tempVertexData.push({key: vertexTypes[i], name: vertexTypes[i]})
       }
-      setAllVerteices(tempVerteicesData);
-      setAllEdges(tempEdgesData);
+      setAllVerteices(tempVertexData);
+      setAllEdges(tempEdgeData);
 
-    }).catch((err) => document.getElementById("error_vertices").innerHTML = err);
+    }).catch((err) => (document.getElementById("error_vertices") as HTMLElement).innerHTML = err);
     
     //Fullfill installedQuires with all installed quires, use name as reference (if there are better way change the type of installed quires)
-    console.log("Chaning options for installed queries");
-    
-
-    let doc = document.getElementById("wroteQuiresTextArea");
-    
-    // doc.innerHTML = `INTERPRET QUERY () FOR GRAPH ${graphName} {\n\n}`;
-    // doc.value = `INTERPRET QUERY () FOR GRAPH ${graphName} {\n\n}`;
-
+    console.log("Changing options for installed queries");
 
     conn.listQueries().then((arr) => {
       console.log(arr);
@@ -143,10 +130,10 @@ export default () => {
       }
 
 
-      document.getElementById("wroteQuiresTextArea").value = "INTERPRET QUERY () FOR GRAPH "+graphName+" {<br><br>}";
+      (document.getElementById("writtenQueriesTextArea") as HTMLInputElement).value = "INTERPRET QUERY () FOR GRAPH "+graphName+" {<br><br>}";
 
       setInstalledQueryData(tempInstalledQueryData);
-    }).catch((err) => document.getElementById("error_installed").innerHTML = err);
+    }).catch((err) => (document.getElementById("error_installed") as HTMLElement).innerHTML = err);
 
     // if (host == "1"){
     //   var tempInstalledQueryData = [];
@@ -162,31 +149,31 @@ export default () => {
   const [allVerteices, setAllVerteices] = useState<VertexType[]>([]);
   const [allEdges, setAllEdges] = useState<EdgeType[]>([]);
 
-  const [selectedVerteicesKeys, setSelectedVerteicesKeys] = useState<React.Key[]>([]);
-  const [selectedEdgesKeys, setSelectedEdgesKeys] = useState<React.Key[]>([]);
+  const [selectedVertexKeys, setSelectedVerteicesKeys] = useState<React.Key[]>([]);
+  const [selectedEdgeKeys, setSelectedEdgesKeys] = useState<React.Key[]>([]);
 
   const onVerteicesSelectChange = (newSelectedVerteicesKeys: React.Key[]) => {
     clearVertexError();
-    console.log('selectedRowKeys changed: ', selectedVerteicesKeys);
+    console.log('selectedRowKeys changed: ', selectedVertexKeys);
     setSelectedVerteicesKeys(newSelectedVerteicesKeys);
   };
   const onEdgesSelectChange = (newSelectedEdgesKeys: React.Key[]) => {
     clearVertexError();
-    console.log('selectedRowKeys changed: ', selectedEdgesKeys);
+    console.log('selectedRowKeys changed: ', selectedEdgeKeys);
     setSelectedEdgesKeys(newSelectedEdgesKeys);
   };
 
   const verteicesSelection = {
-    selectedVerteicesKeys,
+    selectedVerteicesKeys: selectedVertexKeys,
     onChange: onVerteicesSelectChange,
   };
   const edgesSelection = {
-    selectedEdgesKeys,
+    selectedEdgesKeys: selectedEdgeKeys,
     onChange: onEdgesSelectChange,
   };
 
-  const verteicesHasSelected = selectedVerteicesKeys.length > 0;
-  const edgesHasSelected = selectedEdgesKeys.length > 0;
+  const verteicesHasSelected = selectedVertexKeys.length > 0;
+  const edgesHasSelected = selectedEdgeKeys.length > 0;
 
   const allVerteicesColumn: ColumnsType<VertexType> = [
     {
@@ -204,10 +191,10 @@ export default () => {
 
   const runSelectedVE = () =>{
     //Get all types of vertix in selectedVertices and all types of edge in selected Edges
-    console.log(selectedEdgesKeys, selectedVerteicesKeys)
-    createGraph(selectedVerteicesKeys, selectedEdgesKeys);
-    console.log("Selected Verteices:", selectedVerteicesKeys);
-    console.log("Selected Edges:", selectedEdgesKeys);
+    console.log(selectedEdgeKeys, selectedVertexKeys)
+    createGraph(selectedVertexKeys as string[], selectedEdgeKeys as string[]);
+    console.log("Selected Verteices:", selectedVertexKeys);
+    console.log("Selected Edges:", selectedEdgeKeys);
   };
   // *********************************************
 
@@ -232,11 +219,11 @@ export default () => {
   
 
   // **************** Write Query ****************
-  const runWrotedQuery = () =>{
+  const runWrittenQuery = () =>{
     //Get GSQL first and connect to backend with the GSQL
     var gsql: string;
-    gsql = document.getElementById("wroteQuiresTextArea").value;
-    console.log(document.getElementById("wroteQuiresTextArea").value);
+    gsql = (document.getElementById("writtenQueriesTextArea") as HTMLInputElement).value;
+    console.log(gsql);
 
     createGraphQueryString(gsql);
 
@@ -261,14 +248,14 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
-          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
+          (document.getElementById("node_info") as HTMLElement).innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch((err) => document.getElementById("error_vertices").innerHTML = err + "<br><strong>Make sure you selected the source and target vertex types for all the edges!</strong>");
+}).catch((err) => (document.getElementById("error_vertices") as HTMLElement).innerHTML = err + "<br><strong>Make sure you selected the source and target vertex types for all the edges!</strong>");
 }
 
 async function createGraphQuery(query_name: string) {
@@ -286,14 +273,14 @@ async function createGraphQuery(query_name: string) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
-          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
+          (document.getElementById("node_info") as HTMLElement).innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch(err => document.getElementById("error_installed").innerHTML = err+ "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
+}).catch(err => (document.getElementById("error_installed") as HTMLElement).innerHTML = err+ "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
 }
 
 async function createGraphQueryString(query_string: string) {
@@ -306,14 +293,14 @@ async function createGraphQueryString(query_string: string) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
-          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
+          (document.getElementById("node_info") as HTMLElement).innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch(err => document.getElementById("error_interpreted").innerHTML = err + "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
+}).catch(err => (document.getElementById("error_interpreted") as HTMLElement).innerHTML = err + "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
 }
 
 
@@ -336,7 +323,7 @@ async function createGraphQueryString(query_string: string) {
                 optionFilterProp="children"
                 onChange={onChangeConnections}
                 onSearch={onConnectionSearch}
-                filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
+                filterOption={(input, option) => (option == undefined || option?.children == undefined) ?? option?.children?.toString().toLowerCase().includes(input.toLowerCase())}
               >
                 {connctionOptions}
               </Select>
@@ -347,7 +334,7 @@ async function createGraphQueryString(query_string: string) {
                 <Col span={12}>
                   <div>
                     <span style={{ marginLeft: 8 }}>
-                      {verteicesHasSelected ? `Selected ${selectedVerteicesKeys.length} items` : ''}
+                      {verteicesHasSelected ? `Selected ${selectedVertexKeys.length} items` : ''}
                     </span>
                   </div>
                   <Table 
@@ -359,7 +346,7 @@ async function createGraphQueryString(query_string: string) {
                 <Col span={12}>
                   <div>
                     <span style={{ marginLeft: 8 }}>
-                      {edgesHasSelected ? `Selected ${selectedEdgesKeys.length} items` : ''}
+                      {edgesHasSelected ? `Selected ${selectedEdgeKeys.length} items` : ''}
                     </span>
                   </div>
                   <Table 
@@ -414,7 +401,7 @@ async function createGraphQueryString(query_string: string) {
             <ProCard title="Write Queries">
               <TextArea 
                 rows={4}
-                id = "wroteQuiresTextArea"
+                id = "writtenQueriesTextArea"
                 placeholder="Write GSQL queries and hit run button"
                 onChange={clearInterpretedError}></TextArea>
               <br />
@@ -429,7 +416,7 @@ async function createGraphQueryString(query_string: string) {
                   <Button
                     key="render"
                     type="primary"
-                    onClick={runWrotedQuery}
+                    onClick={runWrittenQuery}
                     shape="round"
                     block>
                     Run
