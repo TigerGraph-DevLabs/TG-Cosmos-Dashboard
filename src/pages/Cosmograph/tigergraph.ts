@@ -26,7 +26,7 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
     this.graphname = graphname;
     this.username = username;
     this.password = password;
-    this.token = "spj2tj2b8it2ogra2pifk45tjm4acqcu";
+    this.token = token ? token : "";
   }
 
   async generateToken() {

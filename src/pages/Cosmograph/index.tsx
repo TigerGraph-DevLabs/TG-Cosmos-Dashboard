@@ -243,9 +243,6 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
 
     const canvas = document.querySelector("canvas") as HTMLCanvasElement;
     const config: GraphConfigInterface<InputNode, InputLink> = {
-      simulation: {
-        decay: 10000
-      },
       nodeColor: v => `${type_to_colour.get("" + v.v_type)}`,
       linkArrows: false,
       events: {
