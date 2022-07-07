@@ -217,7 +217,7 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
         } else return this.queries();
     }
     
-    async getVertexEdgeTypes(){
+    async getVertexEdgeTypes(): Promise<{edges: string[], vertices: string[]}>{
         return fetch(`${this.host}:14240/gsqlserver/gsql/schema?graph=${this.graphname}`, {
             method: 'GET',
             headers: {
@@ -232,11 +232,13 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
             return response.json();
         }).then(data => {
             console.log(data);
-            let types = {edges: [], vertices: []};
+            let edges: string[] = [];
+            let vertices: string[] = [];
+            let types = {edges: edges, vertices: vertices};
             let edgeTypes = data.results.EdgeTypes;
             let vertexTypes = data.results.VertexTypes;
             for(let i in edgeTypes){
-                types.edges.push(edgeTypes[i].Name);
+                types.edges.push(edgeTypes[i].Name as string);
             }
             for(let i in vertexTypes){
                 types.vertices.push(vertexTypes[i].Name);

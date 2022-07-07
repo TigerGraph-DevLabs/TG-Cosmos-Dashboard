@@ -50,9 +50,9 @@ export default () => {
     console.log('search:', value);
   };
 
-  const clearInterpretedError = () => document.getElementById("error_interpreted").innerHTML = "";
-  const clearInstalledError = () => document.getElementById("error_installed").innerHTML = "";
-  const clearVertexError = () => document.getElementById("error_vertices").innerHTML = "";
+  const clearInterpretedError = () => (document.getElementById("error_interpreted") as HTMLElement).innerHTML = "";
+  const clearInstalledError = () => (document.getElementById("error_installed") as HTMLElement).innerHTML = "";
+  const clearVertexError = () => (document.getElementById("error_vertices") as HTMLElement).innerHTML = "";
 
   const onChangeConnections = (index: any) => {
     clearInterpretedError();
@@ -117,7 +117,7 @@ export default () => {
       setAllVerteices(tempVertexData);
       setAllEdges(tempEdgeData);
 
-    }).catch((err) => document.getElementById("error_vertices").innerHTML = err);
+    }).catch((err) => (document.getElementById("error_vertices") as HTMLElement).innerHTML = err);
     
     //Fullfill installedQuires with all installed quires, use name as reference (if there are better way change the type of installed quires)
     console.log("Changing options for installed queries");
@@ -133,7 +133,7 @@ export default () => {
       (document.getElementById("writtenQueriesTextArea") as HTMLInputElement).value = "INTERPRET QUERY () FOR GRAPH "+graphName+" {<br><br>}";
 
       setInstalledQueryData(tempInstalledQueryData);
-    }).catch((err) => document.getElementById("error_installed").innerHTML = err);
+    }).catch((err) => (document.getElementById("error_installed") as HTMLElement).innerHTML = err);
 
     // if (host == "1"){
     //   var tempInstalledQueryData = [];
@@ -248,14 +248,14 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
-          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
+          (document.getElementById("node_info") as HTMLElement).innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch((err) => document.getElementById("error_vertices").innerHTML = err + "<br><strong>Make sure you selected the source and target vertex types for all the edges!</strong>");
+}).catch((err) => (document.getElementById("error_vertices") as HTMLElement).innerHTML = err + "<br><strong>Make sure you selected the source and target vertex types for all the edges!</strong>");
 }
 
 async function createGraphQuery(query_name: string) {
@@ -273,14 +273,14 @@ async function createGraphQuery(query_name: string) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
-          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
+          (document.getElementById("node_info") as HTMLElement).innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch(err => document.getElementById("error_installed").innerHTML = err+ "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
+}).catch(err => (document.getElementById("error_installed") as HTMLElement).innerHTML = err+ "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
 }
 
 async function createGraphQueryString(query_string: string) {
@@ -293,14 +293,14 @@ async function createGraphQueryString(query_string: string) {
       events: {
         onClick: (node) => {
           console.log("Clicked node: ", node);
-          document.getElementById("node_info").innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
+          (document.getElementById("node_info") as HTMLElement).innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
         }
       }
     };
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch(err => document.getElementById("error_interpreted").innerHTML = err + "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
+}).catch(err => (document.getElementById("error_interpreted") as HTMLElement).innerHTML = err + "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
 }
 
 
@@ -323,7 +323,7 @@ async function createGraphQueryString(query_string: string) {
                 optionFilterProp="children"
                 onChange={onChangeConnections}
                 onSearch={onConnectionSearch}
-                filterOption={(input, option) => option.children.toString().toLowerCase().includes(input.toLowerCase())}
+                filterOption={(input, option) => (option == undefined || option?.children == undefined) ?? option?.children?.toString().toLowerCase().includes(input.toLowerCase())}
               >
                 {connctionOptions}
               </Select>
