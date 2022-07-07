@@ -268,7 +268,7 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch((err) => document.getElementById("error_vertices").innerHTML = err);
+}).catch((err) => document.getElementById("error_vertices").innerHTML = err + "<br><strong>Make sure you selected the source and target vertex types for all the edges!</strong>");
 }
 
 async function createGraphQuery(query_name: string) {
@@ -293,7 +293,7 @@ async function createGraphQuery(query_name: string) {
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch(err => document.getElementById("error_installed").innerHTML = err);
+}).catch(err => document.getElementById("error_installed").innerHTML = err+ "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
 }
 
 async function createGraphQueryString(query_string: string) {
@@ -313,7 +313,7 @@ async function createGraphQueryString(query_string: string) {
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch(err => document.getElementById("error_interpreted").innerHTML = err);
+}).catch(err => document.getElementById("error_interpreted").innerHTML = err + "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
 }
 
 
@@ -369,10 +369,10 @@ async function createGraphQueryString(query_string: string) {
                     dataSource={allEdges} />
                 </Col>
               </Row>
-              <br />
               <Row>
               <label style={{color: "red", textAlign: "center"}} id = "error_vertices"></label>
               </Row>
+              <br />
               <Row>
                 <Col span={8}></Col>
                 <Col span={8}>
@@ -418,10 +418,10 @@ async function createGraphQueryString(query_string: string) {
                 placeholder="Write GSQL queries and hit run button"
                 onChange={clearInterpretedError}></TextArea>
               <br />
-              <br />
               <Row>
               <label style={{color: "red", textAlign: "center"}} id = "error_interpreted"></label>
               </Row>
+              <br />
               
               <Row>
                 <Col span={8}></Col>
