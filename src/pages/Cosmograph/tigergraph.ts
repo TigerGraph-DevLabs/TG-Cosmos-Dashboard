@@ -26,7 +26,7 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
     this.graphname = graphname;
     this.username = username;
     this.password = password;
-    this.token = token ? token : "";
+    this.token = "spj2tj2b8it2ogra2pifk45tjm4acqcu";
   }
 
   async generateToken() {
@@ -252,47 +252,5 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
         } else return this.getVertexEdgeTypes();
 
     }
-
-    async showVE(query_name: string, params?: JSON) : Promise<{ nodes: N[]; links: L[]; }> {
-        return fetch(`${this.host}:9000/query/${this.graphname}/${query_name}`, {
-            method: 'POST',
-            body: params ? JSON.stringify(params) : "{}",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer '+this.token,
-            }
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error(`Error! status: ${response.status}`);
-            }
-        
-            return response.json();
-        }).then(data => {
-            data = data.results;
-
-            const links: L[] = [];
-            const nodes: N[] = [];
-        
-            for (let res in data) {
-                for (let key in data[res]) {
-                    let vertices = data[res][key];
-                    for (let vertex in vertices) {
-                        if (vertices[vertex].v_type === undefined || vertices[vertex].v_id === undefined) break;
-                        nodes.push({...(vertices[vertex].attributes), ...({id: `${vertices[vertex].v_type}_${vertices[vertex].v_id}`, v_id: `${vertices[vertex].v_id}`, v_type: `${vertices[vertex].v_type}`})});          
-                    }
-                    let edges = data[res][key];
-                    for (let edge in edges) {
-                        if (edges[edge].from_type === undefined || edges[edge].to_type === undefined) break;
-                        links.push({...(edges[edge].attributes), ...{ source: `${edges[edge].from_type}_${edges[edge].from_id}`, target: `${edges[edge].to_type}_${edges[edge].to_id}`}});
-                    }
-                }
-            }
-            if (nodes.length === 0) {
-                throw new Error("No vertices detected");
-            } else if (links.length === 0) {
-                throw new Error("No edges detected");
-            }
-            return {"nodes": nodes, "links": links};
-        });
-    }
+    
 }
