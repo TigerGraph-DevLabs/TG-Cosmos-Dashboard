@@ -51,7 +51,14 @@ export default () => {
     console.log('search:', value);
   };
 
+  const clearInterpretedError = () => document.getElementById("error_interpreted").innerHTML = "";
+  const clearInstalledError = () => document.getElementById("error_installed").innerHTML = "";
+  const clearVertexError = () => document.getElementById("error_vertices").innerHTML = "";
+
   const onChangeConnections = (index: any) => {
+    clearInterpretedError();
+    clearInstalledError();
+    clearVertexError();
     //When user change the options for connections
     connectionIndex = index;
     console.log(`selected ${index}`);
@@ -71,20 +78,7 @@ export default () => {
   };
 
   async function testConnection(host:string, graphName:string, userName:string, password:string) {
-    console.log(host,graphName,userName,password)
-    //Test Connections
-    // return fetch(`${host}:443/api/ping`, {
-    //   // mode: "no-cors",
-    //   method: 'GET'
-    // }).then(response => {
-    //   if (!response.ok) {
-    //     console.log(response)
-    //     throw new Error(`Error! status: ${response.status}`);
-    //   }
-    //   return response.json();
-    // }).then(data => {
-    //   return data;
-    // });
+    console.log(host,graphName,userName,password);
   };
 
   const initConnections = (host: string, graphName: string, userName: string, password: string) => {
@@ -129,7 +123,7 @@ export default () => {
       setAllVerteices(tempVerteicesData);
       setAllEdges(tempEdgesData);
 
-    });
+    }).catch((err) => document.getElementById("error_vertices").innerHTML = err);
     
     //Fullfill installedQuires with all installed quires, use name as reference (if there are better way change the type of installed quires)
     console.log("Chaning options for installed queries");
@@ -152,7 +146,7 @@ export default () => {
       document.getElementById("wroteQuiresTextArea").value = "INTERPRET QUERY () FOR GRAPH "+graphName+" {<br><br>}";
 
       setInstalledQueryData(tempInstalledQueryData);
-    }).catch((err) => console.log(err));
+    }).catch((err) => document.getElementById("error_installed").innerHTML = err);
 
     // if (host == "1"){
     //   var tempInstalledQueryData = [];
@@ -172,10 +166,12 @@ export default () => {
   const [selectedEdgesKeys, setSelectedEdgesKeys] = useState<React.Key[]>([]);
 
   const onVerteicesSelectChange = (newSelectedVerteicesKeys: React.Key[]) => {
+    clearVertexError();
     console.log('selectedRowKeys changed: ', selectedVerteicesKeys);
     setSelectedVerteicesKeys(newSelectedVerteicesKeys);
   };
   const onEdgesSelectChange = (newSelectedEdgesKeys: React.Key[]) => {
+    clearVertexError();
     console.log('selectedRowKeys changed: ', selectedEdgesKeys);
     setSelectedEdgesKeys(newSelectedEdgesKeys);
   };
@@ -227,6 +223,7 @@ export default () => {
     }
   ];
   const chooseInstalledQuery = (gsql:string) => {
+    clearInstalledError();
     console.log(gsql);
 
     createGraphQuery(gsql);
@@ -271,7 +268,7 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-});
+}).catch((err) => document.getElementById("error_vertices").innerHTML = err + "<br><strong>Make sure you selected the source and target vertex types for all the edges!</strong>");
 }
 
 async function createGraphQuery(query_name: string) {
@@ -296,7 +293,7 @@ async function createGraphQuery(query_name: string) {
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-});
+}).catch(err => document.getElementById("error_installed").innerHTML = err+ "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
 }
 
 async function createGraphQueryString(query_string: string) {
@@ -316,7 +313,7 @@ async function createGraphQueryString(query_string: string) {
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-});
+}).catch(err => document.getElementById("error_interpreted").innerHTML = err + "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
 }
 
 
@@ -372,6 +369,9 @@ async function createGraphQueryString(query_string: string) {
                     dataSource={allEdges} />
                 </Col>
               </Row>
+              <Row>
+              <label style={{color: "red", textAlign: "center"}} id = "error_vertices"></label>
+              </Row>
               <br />
               <Row>
                 <Col span={8}></Col>
@@ -405,6 +405,9 @@ async function createGraphQueryString(query_string: string) {
                 }
                 columns={installedQueryColumns}
                 dataSource={installedQueryData} />
+              <Row>
+              <label style={{color: "red", textAlign: "center"}} id = "error_installed"></label>
+              </Row>
             </ProCard>
             <br />
 
@@ -412,8 +415,12 @@ async function createGraphQueryString(query_string: string) {
               <TextArea 
                 rows={4}
                 id = "wroteQuiresTextArea"
-                placeholder="Write GSQL queries and hit run button"></TextArea>
+                placeholder="Write GSQL queries and hit run button"
+                onChange={clearInterpretedError}></TextArea>
               <br />
+              <Row>
+              <label style={{color: "red", textAlign: "center"}} id = "error_interpreted"></label>
+              </Row>
               <br />
               
               <Row>
