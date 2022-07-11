@@ -1,0 +1,68 @@
+.title{
+  padding-top: 15px;
+  padding-left: 2%;
+}
+.trigger {
+  padding-top: 5px;
+  padding-left: 92%;
+  font-size: 18px;
+  line-height: 64px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.trigger:hover {
+  color: #1890ff;
+}
+  
+.main-layout {
+  background: #0D0D0D;
+  height:100vh;
+}
+
+.main-layout-header {
+  background: #0D0D0D;
+}
+
+.main-layout-content {
+  background: #0D0D0D;
+}
+
+.sider {
+  background: #222325;
+  overflow: auto;
+  height:100vh;
+}
+
+.sider-card {
+  margin-top: 3%;
+  margin-left: 3%;
+  width: 94%;
+}
+
+.connection-select {
+  width: 100%;
+  padding-left: 0%;
+}
+
+.main-card {
+  margin-left: 2%;
+  width: 96%;
+  height: 96%;
+  background:#222222;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: grey; 
+  border-radius: 5px;
+}
+.list_container {
+    overflow:auto;
+    height: 50px;
+    width: 40px;
+}

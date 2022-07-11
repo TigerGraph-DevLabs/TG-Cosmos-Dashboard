@@ -1,5 +1,5 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Button, Col, Layout, Row, Select, Table } from 'antd';
+import { Button, Col, Row, Select, Table } from 'antd';
 import connectionData from '../../utils/connections.json'
 import { ConfigProvider } from 'antd';
 import en_US from 'antd/lib/locale/en_US';
@@ -8,18 +8,6 @@ import type { ColumnsType } from 'antd/lib/table';
 import { useState } from 'react';
 import { TigerGraphConnection, InputLink, InputNode} from './tigergraph';
 import { Graph, GraphConfigInterface } from "@cosmograph/cosmos";
-import React from 'react';
-import "./index.css";
-import Title from 'antd/lib/typography/Title';
-
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-} from '@ant-design/icons';
-
-// **************** Layouts ****************
-const { Header, Sider, Content } = Layout;
-// *********************************************
 
 // **************** Connections ****************
 const { Option } = Select;
@@ -55,9 +43,6 @@ interface InstalledQueryType {
 let conn = new TigerGraphConnection("", "", "", "");
 
 export default () => {
-  // **************** Layouts ****************
-  const [collapsed, setCollapsed] = useState(false);
-  // *********************************************
   
   // **************** Connections ****************
   const onConnectionSearch = (value: any) => {
@@ -323,43 +308,16 @@ async function createGraphQueryString(query_string: string) {
 
 
   return (
-    <ConfigProvider locale={en_US}>
-        <Layout>
-          <Layout className="main-layout">
-            <Header className="main-layout-header" style={{ padding: 0 }}>
-              <Row>
-                <Col span={18}>
-                  <Title className='title' level={4}>Cosmograph Visualization</Title>
-                </Col>
-                <Col span={6}>
-                  <div>
-                    {React.createElement(collapsed ? MenuFoldOutlined : MenuUnfoldOutlined, {
-                      className: 'trigger',
-                      onClick: () => setCollapsed(!collapsed),
-                    })}
-                  </div>
-                </Col>
-              </Row>
-            </Header>
-            <Content
-              className="main-layout-content"
-            >
-              <ProCard className='main-card'>
-                <canvas style={{width: '100%', height: '100%'}}></canvas>
-              </ProCard>
-            </Content>
-          </Layout>
-          <Sider 
-            className='sider'
-            trigger={null}
-            collapsible
-            collapsed={collapsed}
-            collapsedWidth='0'
-            width='25%'
-          >
-            <ProCard className='sider-card'>
+    <ConfigProvider locale={en_US}> 
+      <PageContainer
+        header={{
+        title: 'Cosmograph Visualization',
+        }}
+      >
+        <Row gutter={16}>
+          <Col span={6}>
+            <ProCard title="Connections">
               <Select
-                className='connection-select'
                 showSearch
                 placeholder="Select a connection"
                 optionFilterProp="children"
@@ -370,20 +328,16 @@ async function createGraphQueryString(query_string: string) {
                 {connctionOptions}
               </Select>
             </ProCard>
-            <ProCard className='sider-card' title="Cosmograph info">
-              <p id = "node_info"></p>
-            </ProCard>
-            <ProCard className='sider-card' title="Select Vertex and Edges">
+            <br />
+            <ProCard title="Select Vertex and Edges">
               <Row>
                 <Col span={12}>
                   <div>
                     <span style={{ marginLeft: 8 }}>
-                      {verteicesHasSelected ? `Selected ${selectedVertexKeys.length} vertices` : ''}
+                      {verteicesHasSelected ? `Selected ${selectedVertexKeys.length} items` : ''}
                     </span>
                   </div>
-                  <Table
-                    scroll={{ y: 200 }}
-                    pagination={false}
+                  <Table 
                     size="small"
                     rowSelection={verteicesSelection}
                     columns={allVerteicesColumn}
@@ -392,12 +346,10 @@ async function createGraphQueryString(query_string: string) {
                 <Col span={12}>
                   <div>
                     <span style={{ marginLeft: 8 }}>
-                      {edgesHasSelected ? `Selected ${selectedEdgeKeys.length} edges` : ''}
+                      {edgesHasSelected ? `Selected ${selectedEdgeKeys.length} items` : ''}
                     </span>
                   </div>
-                  <Table
-                    scroll={{ y: 200 }}
-                    pagination={false}
+                  <Table 
                     size="small"
                     rowSelection={edgesSelection} 
                     columns={allEdgesColumn} 
@@ -424,10 +376,10 @@ async function createGraphQueryString(query_string: string) {
                 <Col span={8}></Col>
               </Row>
             </ProCard>
-            <ProCard className='sider-card' title="Select Installed Queries">
+            <br />
+
+            <ProCard title="Select Installed Queries">
               <Table 
-                scroll={{ y: 200 }}
-                pagination={false}
                 size="small"
                 onRow={
                   (record, index) => {
@@ -444,7 +396,9 @@ async function createGraphQueryString(query_string: string) {
               <label style={{color: "red", textAlign: "center"}} id = "error_installed"></label>
               </Row>
             </ProCard>
-            <ProCard className='sider-card' title="Write Queries">
+            <br />
+
+            <ProCard title="Write Queries">
               <TextArea 
                 rows={4}
                 id = "writtenQueriesTextArea"
@@ -471,9 +425,20 @@ async function createGraphQueryString(query_string: string) {
                 <Col span={8}></Col>
               </Row>
             </ProCard>
-          </Sider>
-        </Layout>
+          </Col>
+
+          <Col span={14}>
+            <ProCard title="Cosmograph Visualization">
+              <canvas width="1000" height="1000" style={{width: '100%', height: '750px'}}></canvas>
+            </ProCard>
+          </Col>
+          <Col span={4}>
+            <ProCard title="Cosmograph info">
+              <p id = "node_info"></p>
+            </ProCard>
+          </Col>
+        </Row>
+      </PageContainer>
     </ConfigProvider>
   );
 }
-

@@ -1,0 +1,30 @@
+.title{
+  padding-top: 15px;
+  padding-left: 2%;
+}
+
+.main-layout {
+  background: #0D0D0D;
+  padding-bottom: 0px;
+  height:100vh;
+}
+
+.main-layout-header{
+  background: #0D0D0D;
+}
+
+.main-layout-content{
+  height: 100%;
+  background: #0D0D0D;
+}
+
+.connection-table{
+  padding-top: 2%;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+
+.connection-table-thead > tr > th{
+  background: #2F3032 !important;
+}

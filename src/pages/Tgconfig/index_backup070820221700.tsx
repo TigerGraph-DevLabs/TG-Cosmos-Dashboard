@@ -1,13 +1,10 @@
-import type { ProColumns } from '@ant-design/pro-components';
+import { PageContainer, ProColumns } from '@ant-design/pro-components';
 import { EditableProTable, ProCard, ProFormField, ProFormRadio } from '@ant-design/pro-components';
-import { Button, Col, Layout, message, Row } from 'antd';
+import { Button, Col, message, Row } from 'antd';
 import React, { useState } from 'react';
 import connectionData from '../../utils/connections.json'
 import { ConfigProvider } from 'antd';
 import en_US from 'antd/lib/locale/en_US';
-import { Content, Header } from 'antd/lib/layout/layout';
-import Title from 'antd/lib/typography/Title';
-import "./index.css";
 
 const waitTime = (time: number = 100) => {
   return new Promise((resolve) => {
@@ -123,93 +120,85 @@ export default () => {
 
   return (
     <ConfigProvider locale={en_US}> 
-      <Layout className="main-layout">
-        <Header className="main-layout-header" style={{ padding: 0 }}>
-          <Row className="main-layout-header">
-            <Col span={18} className="main-layout-header">
-              <Title className='title' level={4}>Tigergraph Connection Configuration</Title>
-            </Col>
-            <Col span={6} className="main-layout-header"></Col>
-          </Row>
-        </Header>
-        <Content
-          className='main-layout-content'>
-          <EditableProTable<DataSourceType>
-            className="connection-table"
-            rowKey="id"
-            headerTitle="Connection List"
-            maxLength={10}
-            scroll={{
-              x: 960,
-            }}
-            recordCreatorProps={
-              position !== 'hidden'
-                ? {
-                    position: position as 'top',
-                    record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
-                  }
-                : false
-            }
-            loading={false}
-            toolBarRender={() => [
-              <ProFormRadio.Group
-                key="render"
-                fieldProps={{
-                  value: position,
-                  onChange: (e) => setPosition(e.target.value),
-                }}
-                options={[
-                  {
-                    label: 'Add to top',
-                    value: 'top',
-                  },
-                  {
-                    label: 'Add to bottom',
-                    value: 'bottom',
-                  },
-                  {
-                    label: 'Hide',
-                    value: 'hidden',
-                  },
-                ]}
-              />
-            ]}
-            columns={columns}
-            request={async () => ({
-              data: defaultData,
-              total: 3,
-              success: true,
-            })}
-            value={dataSource}
-            onChange={setDataSource}
-            editable={{
-              type: 'multiple',
-              editableKeys,
-              onSave: async (rowKey, data, row) => {
-                console.log(rowKey, data, row);
-                await waitTime(2000);
-              },
-              onChange: setEditableRowKeys,
-            }}
-          />
-          <br />
-          <Row>
-            <Col span={10}></Col>
-            <Col span={4}>
-              <Button
-                key="render"
-                type="primary"
-                onClick={() => saveConnectionsToFile(JSON.stringify(dataSource))}
-                shape="round"
-                block>
-                Save
-              </Button>
-            </Col>
-            <Col span={10}></Col>
-          </Row>
-        </Content>
-      </Layout>
-        {/* <ProCard title="Table Data (Delete this part after complete)" headerBordered collapsible defaultCollapsed>
+      <PageContainer
+        header={{
+          title: 'Tigergraph Connection Configuration',
+        }}
+      >
+        <EditableProTable<DataSourceType>
+          rowKey="id"
+          headerTitle="Connection List"
+          maxLength={5}
+          scroll={{
+            x: 960,
+          }}
+          recordCreatorProps={
+            position !== 'hidden'
+              ? {
+                  position: position as 'top',
+                  record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
+                }
+              : false
+          }
+          loading={false}
+          toolBarRender={() => [
+            <ProFormRadio.Group
+              key="render"
+              fieldProps={{
+                value: position,
+                onChange: (e) => setPosition(e.target.value),
+              }}
+              options={[
+                {
+                  label: 'Add to top',
+                  value: 'top',
+                },
+                {
+                  label: 'Add to bottom',
+                  value: 'bottom',
+                },
+                {
+                  label: 'Hide',
+                  value: 'hidden',
+                },
+              ]}
+            />
+          ]}
+          columns={columns}
+          request={async () => ({
+            data: defaultData,
+            total: 3,
+            success: true,
+          })}
+          value={dataSource}
+          onChange={setDataSource}
+          editable={{
+            type: 'multiple',
+            editableKeys,
+            onSave: async (rowKey, data, row) => {
+              console.log(rowKey, data, row);
+              await waitTime(2000);
+            },
+            onChange: setEditableRowKeys,
+          }}
+        />
+        <br />
+        <Row>
+          <Col span={10}></Col>
+          <Col span={4}>
+            <Button
+              key="render"
+              type="primary"
+              onClick={() => saveConnectionsToFile(JSON.stringify(dataSource))}
+              shape="round"
+              block>
+              Save
+            </Button>
+          </Col>
+          <Col span={10}></Col>
+        </Row>
+        <br />
+        <ProCard title="Table Data (Delete this part after complete)" headerBordered collapsible defaultCollapsed>
           <ProFormField
             ignoreFormItem
             fieldProps={{
@@ -221,7 +210,8 @@ export default () => {
             valueType="jsonCode"
             text={JSON.stringify(dataSource)}
           />
-        </ProCard> */}
+        </ProCard>
+      </PageContainer>
     </ConfigProvider>
   );
 };

@@ -1,0 +1,9 @@
+Dark Theme Colors:
+    Dark:
+        #0D0D0D
+        #222325
+        #2F3032
+        #343B46
+    Light (for text):
+        #696969
+        #EBEBEB
