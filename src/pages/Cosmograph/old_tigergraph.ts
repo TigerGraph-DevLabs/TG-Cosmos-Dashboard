@@ -49,26 +49,17 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
     });
   }
 
-  async createConnection() {
-    return fetch(`http://127.0.0.1:8010/createConnection?host=${this.host}&graphname=${this.graphname}&username=${this.username}&password=${this.password}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-    }).then(response => {
-        if (!response.ok) {
-          throw new Error(`Error! status: ${response.status}`);
-        }
-        return response.json();
-    }).then(res => {
-        console.log(res);
-    });
-  }
-
   async getTigerGraphData(vertex_type: Array<string>, edge_type: Array<string>) : Promise<{ nodes: N[]; links: L[]; }> {
-    return fetch(`http://127.0.0.1:8010/createConnection`, {
-        method: 'GET',
-        body: `{}`,
+    return fetch(`${this.host}:14240/gsqlserver/interpreted_query`, {
+        method: 'POST',
+        body: `INTERPRET QUERY () FOR GRAPH ${this.graphname} {
+          ListAccum<EDGE> @@edges;
+          Seed = {${vertex_type.join(".*, ")}.*};
+          Res = SELECT d FROM Seed:d - ((${edge_type.join(" | ")}):e) -> :t
+                  ACCUM @@edges += e;
+          PRINT Seed;
+          PRINT @@edges AS edges;
+        }`,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Basic '+btoa(`${this.username}:${this.password}`),
@@ -145,13 +136,13 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
     }
 
     async runQuery(query_name: string, params?: JSON) : Promise<{ nodes: N[]; links: L[]; }> {
-        return fetch(`http://127.0.0.1:8010/installedQuery/${query_name}`, {
-            method: 'GET'
-            // body: params ? JSON.stringify(params) : "{}",
-            // headers: {
-            //     'Content-Type': 'application/json',
-            //     'Authorization': 'Bearer '+this.token,
-            // }
+        return fetch(`${this.host}:9000/query/${this.graphname}/${query_name}`, {
+            method: 'POST',
+            body: params ? JSON.stringify(params) : "{}",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+this.token,
+            }
         }).then(response => {
             if (!response.ok) {
                 throw new Error(`Error! status: ${response.status}`);
@@ -159,7 +150,7 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
         
             return response.json();
         }).then(data => {
-            // data = data.results;
+            data = data.results;
 
             const links: L[] = [];
             const nodes: N[] = [];
@@ -194,8 +185,13 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
     }
 
     async queries() {
-        return fetch(`http://127.0.0.1:8010/getQueries`, {
-            method: 'GET'
+        // curl -X GET "https://bleve.i.tgcloud.io:9000/endpoints/Patents?dynamic=true" -H "Authorization: Bearer uh40mfkn5ij24qfbhk3fnt653l4bojbh"
+        return fetch(`${this.host}:9000/endpoints/${this.graphname}?dynamic=true`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+this.token,
+            }
         }).then(response => {
             if (!response.ok) {
                 throw new Error(`Error! status: ${response.status}`);
@@ -204,7 +200,14 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
             return response.json();
         }).then(data => {
             console.log(data);
-            return data;
+            let queries = [];
+            for (let key in data) {
+                let opts = key.split("/");
+                if (opts[opts.length-2] == this.graphname && queries.indexOf(opts[opts.length-1]) == -1) {
+                    queries.push(opts[opts.length-1]);
+                }
+            }
+            return queries;
         })
     }
 
