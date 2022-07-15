@@ -217,7 +217,48 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
         } else return this.queries();
     }
     
-    async getVertexEdgeTypes(): Promise<{edges: string[], vertices: string[]}>{
+    async getVertexEdgeTypes(): Promise<{edges: {}, vertices: string[]}>{
+        return fetch(`${this.host}:14240/gsqlserver/gsql/schema?graph=${this.graphname}`, {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic '+btoa(`${this.username}:${this.password}`),
+            }
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+        
+            return response.json();
+        }).then(data => {
+            console.log(data);
+            //let edges: string[] = [];
+            let vertices: string[] = [];
+            let edges = {name: [] as string[], fromVertexType: [] as string[], toVertexType: [] as string[]};
+            let types = {edges: edges, vertices: vertices};
+            let edgeTypes = data.results.EdgeTypes;
+            let vertexTypes = data.results.VertexTypes;
+            for(let i in edgeTypes){
+                types.edges.name.push(edgeTypes[i].Name);
+                types.edges.fromVertexType.push(edgeTypes[i].FromVertexTypeName)
+                types.edges.toVertexType.push(edgeTypes[i].ToVertexTypeName)
+            }
+            for(let i in vertexTypes){
+                types.vertices.push(vertexTypes[i].Name);
+            }
+            
+            return types;
+        })
+    }
+
+    async listVertexEdgeTypes(){
+        if (this.token === "") {
+            return this.generateToken().then(() => this.getVertexEdgeTypes());
+        } else return this.getVertexEdgeTypes();
+
+    }
+
+    async getEdgeTypes(): Promise<{edges: string[], vertices: string[]}>{
         return fetch(`${this.host}:14240/gsqlserver/gsql/schema?graph=${this.graphname}`, {
             method: 'GET',
             headers: {
@@ -246,13 +287,6 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
             
             return types;
         })
-    }
-
-    async listVertexEdgeTypes(){
-        if (this.token === "") {
-            return this.generateToken().then(() => this.getVertexEdgeTypes());
-        } else return this.getVertexEdgeTypes();
-
     }
     
 }
