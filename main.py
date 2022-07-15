@@ -22,7 +22,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class Data(BaseModel):
+    query: str
+
 CONN = False
+
+@app.post("/interpretedQuery")
+async def interpreted_query(query: Data):
+    global CONN 
+    res = CONN.runInterpretedQuery(query.query)
+    # print(res)
+    return {"results": res}
 
 @app.get("/createConnection")
 async def create_connection(host, graphname, username, password):
@@ -46,13 +56,6 @@ async def create_connection():
 async def installed_query(query):
     global CONN 
     res = CONN.runInstalledQuery(query)
-    return res
-
-@app.get("/interpretedQuery/{query}")
-async def interpreted_query(query):
-    global CONN 
-    res = CONN.runInterpretedQuery(query)
-    print(res)
     return res
 
 @app.get("/getVertexEdgeTypes")

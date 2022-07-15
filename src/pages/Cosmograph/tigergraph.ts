@@ -29,25 +29,25 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
     this.token = token ? token : "";
   }
 
-  async generateToken() {
-    return fetch(`${this.host}:9000/requesttoken`, {
-        method: 'POST',
-        body: `{"graph": "${this.graphname}"}`,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic '+btoa(`${this.username}:${this.password}`),
-        }
-    }).then(response => {
-        if (!response.ok) {
-            throw new Error(`Error! status: ${response.status}`);
-        }
+//   async generateToken() {
+//     return fetch(`${this.host}:9000/requesttoken`, {
+//         method: 'POST',
+//         body: `{"graph": "${this.graphname}"}`,
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': 'Basic '+btoa(`${this.username}:${this.password}`),
+//         }
+//     }).then(response => {
+//         if (!response.ok) {
+//             throw new Error(`Error! status: ${response.status}`);
+//         }
     
-        return response.json();
-    }).then(data => {
-        this.token = data.results.token;
-        return this.token;
-    });
-  }
+//         return response.json();
+//     }).then(data => {
+//         this.token = data.results.token;
+//         return this.token;
+//     });
+//   }
 
   async createConnection() {
     return fetch(`http://127.0.0.1:8010/createConnection?host=${this.host}&graphname=${this.graphname}&username=${this.username}&password=${this.password}`, {
@@ -102,13 +102,12 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
   }
 
     async runInterpretedQuery(interpreted_query: string) : Promise<{ nodes: N[]; links: L[]; }> {
-        return fetch(`${this.host}:14240/gsqlserver/interpreted_query`, {
+        return fetch(`http://127.0.0.1:8010/interpretedQuery`, {
             method: 'POST',
-            body: interpreted_query,
             headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic '+btoa(`${this.username}:${this.password}`),
-            }
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({query: interpreted_query})
         }).then(response => {
             if (!response.ok) {
                 throw new Error(`Error! status: ${response.status}`);
@@ -191,11 +190,11 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
         });
     }
 
-    async runInstalledQuery(query_name: string, params?: JSON) : Promise<{ nodes: N[]; links: L[]; }> {
-        if (this.token === "") {
-            return this.generateToken().then(() => this.runQuery(query_name, params));
-        } else return this.runQuery(query_name, params);
-    }
+    // async runInstalledQuery(query_name: string, params?: JSON) : Promise<{ nodes: N[]; links: L[]; }> {
+    //     if (this.token === "") {
+    //         return this.generateToken().then(() => this.runQuery(query_name, params));
+    //     } else return this.runQuery(query_name, params);
+    // }
 
     async queries() {
         return fetch(`http://127.0.0.1:8010/getQueries`, {
@@ -212,11 +211,11 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
         })
     }
 
-    async listQueries() {
-        if (this.token === "") {
-            return this.generateToken().then(() => this.queries());
-        } else return this.queries();
-    }
+    // async listQueries() {
+    //     if (this.token === "") {
+    //         return this.generateToken().then(() => this.queries());
+    //     } else return this.queries();
+    // }
     
     async getVertexEdgeTypes(): Promise<{edges: string[], vertices: string[]}>{
         return fetch(`http://127.0.0.1:8010/getVertexEdgeTypes`, {
@@ -236,11 +235,11 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
         })
     }
 
-    async listVertexEdgeTypes(){
-        if (this.token === "") {
-            return this.generateToken().then(() => this.getVertexEdgeTypes());
-        } else return this.getVertexEdgeTypes();
+    // async listVertexEdgeTypes(){
+    //     if (this.token === "") {
+    //         return this.generateToken().then(() => this.getVertexEdgeTypes());
+    //     } else return this.getVertexEdgeTypes();
 
-    }
+    // }
     
 }
