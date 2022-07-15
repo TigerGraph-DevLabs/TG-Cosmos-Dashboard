@@ -99,6 +99,7 @@ export default () => {
 
     //make connection to tg cloud
     conn = new TigerGraphConnection(host, graphName, userName, password);
+    conn.createConnection().then(() => {
     //Make Connections with TG Cloud and Get all type of verteices/edges and installed queries
     //Fullfill allVerteices with all type of vertices, push with CheckboxOption type
     //Fullfill allEdges with all type of edges, push with CheckboxOption type
@@ -117,7 +118,7 @@ export default () => {
       setAllEdges(tempEdgesData);
     }
 
-    conn.listVertexEdgeTypes().then((data) => {
+    conn.getVertexEdgeTypes().then((data) => {
       let edgeTypes = data.edges;
       let vertexTypes = data.vertices;
       var tempVertexData = [];
@@ -137,7 +138,7 @@ export default () => {
     //Fullfill installedQuires with all installed quires, use name as reference (if there are better way change the type of installed quires)
     console.log("Changing options for installed queries");
 
-    conn.listQueries().then((arr) => {
+    conn.queries().then((arr) => {
       console.log(arr);
       var tempInstalledQueryData = [];
       for (let i in arr) {        
@@ -156,6 +157,7 @@ export default () => {
     //   tempInstalledQueryData.push({key: 2, name:"Installed Query 2", body:"SELECT SOMETHINE WHERE SOMETHINE"})
     //   setInstalledQueryData(tempInstalledQueryData);
     // }
+  })
   };
   // *********************************************
 
@@ -274,7 +276,7 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
 }
 
 async function createGraphQuery(query_name: string) {
-  conn.runInstalledQuery(query_name).then((x) => {
+  conn.runQuery(query_name).then((x) => {
     const type_to_colour : Map<string, string> = new Map();
 
   //   for (let v in v_array) {
