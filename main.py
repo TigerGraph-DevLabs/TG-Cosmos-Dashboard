@@ -1,10 +1,11 @@
 from cmath import nan
 import uvicorn
 import json
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pyTigerGraph as tg
+from typing import List, Union
 
 app = FastAPI()
 
@@ -45,7 +46,6 @@ async def create_connection():
 async def installed_query(query):
     global CONN 
     res = CONN.runInstalledQuery(query)
-    print(res)
     return res
 
 @app.get("/interpretedQuery/{query}")
@@ -54,6 +54,34 @@ async def interpreted_query(query):
     res = CONN.runInterpretedQuery(query)
     print(res)
     return res
+
+@app.get("/getVertexEdgeTypes")
+async def get_vertex_edge_types():
+    global CONN 
+    res = CONN.getSchema()
+    v = []
+    e = []
+    for i in res["VertexTypes"]: v.append(i["Name"])
+    for i in res["EdgeTypes"]: e.append(i["Name"])
+    return {"v": v, "e": e}
+
+@app.get("/getVertexEdgeData")
+async def get_vertex_edge_types(v: Union[List[str], None] = Query(default=None), e: Union[List[str], None] = Query(default=None)):
+    global CONN
+    print(v, e)
+    s = (f"INTERPRET QUERY () FOR GRAPH {CONN.graphname} "
+    "{     ListAccum<EDGE> @@edges;"
+    "      Seed = { "
+    f"      {'.*, '.join(v)}"
+    ".*};"
+    f"      Res = SELECT d FROM Seed:d - (({' | '.join(e)}):e) -> :t"
+    f"              ACCUM @@edges += e;"
+    f"      PRINT Seed;"
+    "      PRINT @@edges AS edges;}" )
+    print(s)
+    res = CONN.runInterpretedQuery(s)
+    # print(res)
+    return {"Res": res}
 
 @app.get("/saveConnections/") 
 async def save_connections(connection: str):

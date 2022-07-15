@@ -118,7 +118,7 @@ export default () => {
       setAllEdges(tempEdgesData);
     }
 
-    conn.listVertexEdgeTypes().then((data) => {
+    conn.getVertexEdgeTypes().then((data) => {
       let edgeTypes = data.edges;
       let vertexTypes = data.vertices;
       var tempVertexData = [];

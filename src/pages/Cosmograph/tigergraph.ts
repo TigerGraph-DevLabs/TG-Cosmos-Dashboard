@@ -66,13 +66,12 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
   }
 
   async getTigerGraphData(vertex_type: Array<string>, edge_type: Array<string>) : Promise<{ nodes: N[]; links: L[]; }> {
-    return fetch(`http://127.0.0.1:8010/createConnection`, {
-        method: 'GET',
-        body: `{}`,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Basic '+btoa(`${this.username}:${this.password}`),
-        }
+    let v_str = "", e_str = "";
+    for (let x in vertex_type) v_str += `v=${vertex_type[x]}&`;
+    for (let x in edge_type) e_str += `e=${edge_type[x]}&`;
+    e_str = e_str.slice(0, e_str.length-1);
+    return fetch(`http://127.0.0.1:8010/getVertexEdgeData?${v_str}${e_str}`, {
+        method: 'GET'
     }).then(response => {
         if (!response.ok) {
           throw new Error(`Error! status: ${response.status}`);
@@ -87,9 +86,14 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
         if (data.error) {
           throw new Error(`Error! status: ${data.message}`);
         }
+
+        console.log(data.Res);
   
-        let vertices = data.results[0]["Seed"];
-        let edges = data.results[1]["edges"];
+        let vertices = data.Res[0].Seed;
+        let edges = data.Res[1].edges;
+
+        console.log(vertices, edges);
+
         for (let vertex in vertices) nodes.push({...(vertices[vertex].attributes), ...({id: `${vertices[vertex].v_type}_${vertices[vertex].v_id}`, v_id: `${vertices[vertex].v_id}`, v_type: `${vertices[vertex].v_type}`})});
         for (let edge in edges) links.push({...(edges[edge].attributes), ...{ source: `${edges[edge].from_type}_${edges[edge].from_id}`, target: `${edges[edge].to_type}_${edges[edge].to_id}`}});
   
@@ -215,12 +219,8 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
     }
     
     async getVertexEdgeTypes(): Promise<{edges: string[], vertices: string[]}>{
-        return fetch(`${this.host}:14240/gsqlserver/gsql/schema?graph=${this.graphname}`, {
-            method: 'GET',
-            headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Basic '+btoa(`${this.username}:${this.password}`),
-            }
+        return fetch(`http://127.0.0.1:8010/getVertexEdgeTypes`, {
+            method: 'GET'
         }).then(response => {
             if (!response.ok) {
                 throw new Error(`Error! status: ${response.status}`);
@@ -229,17 +229,8 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
             return response.json();
         }).then(data => {
             console.log(data);
-            let edges: string[] = [];
-            let vertices: string[] = [];
-            let types = {edges: edges, vertices: vertices};
-            let edgeTypes = data.results.EdgeTypes;
-            let vertexTypes = data.results.VertexTypes;
-            for(let i in edgeTypes){
-                types.edges.push(edgeTypes[i].Name as string);
-            }
-            for(let i in vertexTypes){
-                types.vertices.push(vertexTypes[i].Name);
-            }
+            let types = {edges: data.e, vertices: data.v};
+            console.log(types)
             
             return types;
         })
