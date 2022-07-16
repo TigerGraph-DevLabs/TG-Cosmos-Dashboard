@@ -107,7 +107,7 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
             headers: {
                 "Content-type": "application/json"
             },
-            body: JSON.stringify({query: interpreted_query})
+            body: JSON.stringify({query: `INTERPRET QUERY () FOR GRAPH ${this.graphname} { ${interpreted_query} }`})
         }).then(response => {
             if (!response.ok) {
                 throw new Error(`Error! status: ${response.status}`);
