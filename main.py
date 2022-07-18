@@ -61,11 +61,19 @@ async def installed_query(query):
 @app.get("/getVertexEdgeTypes")
 async def get_vertex_edge_types():
     global CONN 
+
     res = CONN.getSchema()
+
+    e = {"name": [], "fromVertexType": [], "toVertexType": []}
     v = []
-    e = []
-    for i in res["VertexTypes"]: v.append(i["Name"])
-    for i in res["EdgeTypes"]: e.append(i["Name"])
+    for i in res["VertexTypes"]: 
+        v.append(i["Name"])    
+
+    for i in res["EdgeTypes"]: 
+        e["name"].append(i["Name"])
+        e["fromVertexType"].append(i["FromVertexTypeName"])
+        e["toVertexType"].append(i["ToVertexTypeName"])
+    
     return {"v": v, "e": e}
 
 @app.get("/getVertexEdgeData")

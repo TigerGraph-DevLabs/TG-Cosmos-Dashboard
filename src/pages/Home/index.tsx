@@ -16,7 +16,7 @@ const data = [
     title: 'Visualize your data',
     desc: 'Go to Cosmograph Visualization page. Select a connection.\
     You can select the vertices and edges from your schema, or select an installed query for data visualization.\
-    You can also write a intepreted query by yourself!'
+    You can also write an intepreted query by yourself!'
   },
   {
     title: 'Please note that it takes some time to load a big data graph',

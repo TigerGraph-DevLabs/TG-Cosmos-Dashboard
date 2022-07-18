@@ -217,7 +217,7 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
     //     } else return this.queries();
     // }
     
-    async getVertexEdgeTypes(): Promise<{edges: string[], vertices: string[]}>{
+    async getVertexEdgeTypes(): Promise<{edges: {}, vertices: string[]}>{
         return fetch(`http://127.0.0.1:8010/getVertexEdgeTypes`, {
             method: 'GET'
         }).then(response => {

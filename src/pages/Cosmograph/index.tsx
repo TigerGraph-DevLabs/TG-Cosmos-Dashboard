@@ -42,6 +42,9 @@ interface EdgeType {
   key: React.Key;
   name: string;
 }
+
+const vertexRelatedEdge = new Map<string, Set<string>>();
+const edgeRelatedVertex = new Map<string, string[]>();
 // *********************************************
 
 // ************** Installed Query **************
@@ -119,17 +122,23 @@ export default () => {
     }
 
     conn.getVertexEdgeTypes().then((data) => {
-      let edgeTypes = data.edges;
+      let edgeTypes = data.edges.name;
       let vertexTypes = data.vertices;
-      var tempVertexData = [];
-      var tempEdgeData = [];
+      var tempVertexData = [] as VertexType[];
+      var tempEdgeData = [] as EdgeType[];
 
-      for(let i in edgeTypes){
-        tempEdgeData.push({key: edgeTypes[i], name: edgeTypes[i]});
-      }
       for(let i in vertexTypes){
         tempVertexData.push({key: vertexTypes[i], name: vertexTypes[i]})
+        vertexRelatedEdge.set(vertexTypes[i], new Set<string>());
       }
+
+      for(let i in edgeTypes){
+        vertexRelatedEdge.get(data.edges.fromVertexType[i])?.add(edgeTypes[i]);
+        vertexRelatedEdge.get(data.edges.toVertexType[i])?.add(edgeTypes[i]);
+        edgeRelatedVertex.set(edgeTypes[i], [data.edges.fromVertexType[i], data.edges.toVertexType[i]]);
+
+      }
+
       setAllVerteices(tempVertexData);
       setAllEdges(tempEdgeData);
 
@@ -171,13 +180,41 @@ export default () => {
 
   const onVerteicesSelectChange = (newSelectedVerteicesKeys: React.Key[]) => {
     clearVertexError();
-    console.log('selectedRowKeys changed: ', selectedVertexKeys);
+    //console.log('selectedRowKeys changed: ', selectedVertexKeys);
     setSelectedVerteicesKeys(newSelectedVerteicesKeys);
+    console.log('selectedRowKeys changed: ', newSelectedVerteicesKeys);
+    let tempSet = new Set<string>();
+    for(let i in newSelectedVerteicesKeys){
+        vertexRelatedEdge.get(newSelectedVerteicesKeys[i]).forEach((element) => {
+        tempSet.add(element);
+      });
+    }
+    let edgetypes = [] as EdgeType[];
+    tempSet.forEach((s) => {
+      edgetypes.push({key: s, name: s})
+    })
+    setAllEdges(edgetypes);
+
   };
   const onEdgesSelectChange = (newSelectedEdgesKeys: React.Key[]) => {
     clearVertexError();
     console.log('selectedRowKeys changed: ', selectedEdgeKeys);
     setSelectedEdgesKeys(newSelectedEdgesKeys);
+    console.log('selectedRowKeys changed: ', newSelectedEdgesKeys)
+    let tempSet = new Set<string>();
+    for(let i in newSelectedEdgesKeys){
+      edgeRelatedVertex.get(newSelectedEdgesKeys[i])?.forEach((v) => {
+        tempSet.add(v);
+      })
+    }
+
+    let vertexTypes = [] as string[];
+    tempSet.forEach((s) => {
+      vertexTypes.push(s);
+    })
+    setSelectedVerteicesKeys(vertexTypes);
+
+
   };
 
   const verteicesSelection = {
