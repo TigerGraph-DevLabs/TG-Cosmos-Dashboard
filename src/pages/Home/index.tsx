@@ -19,8 +19,14 @@ const data = [
     You can also write an intepreted query by yourself!'
   },
   {
+    title: 'Enable hardware acceleration',
+    desc: 'Cosmos is a GPU-accelerated Force Graph. Turn on your hardware acceleration for best experience!'
+  },
+  {
+    desc: 'Chrome: Settings -> System -> Use hardware acceleration when available'
+  },
+  {
     title: 'Please note that it takes some time to load a big data graph',
-    desc: ''
   },
   
 ];
