@@ -1,5 +1,5 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Button, Col, Layout, Row, Select, Table } from 'antd';
+import { Button, Col, Layout, Row, Select, Spin, Table } from 'antd';
 import connectionData from '../../utils/connections.json'
 import { ConfigProvider } from 'antd';
 import en_US from 'antd/lib/locale/en_US';
@@ -16,6 +16,24 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
+
+// **************** Encryption ****************
+
+const key = "SMDUCA523555AAFFWTSSX6"
+const crypto = require('crypto');
+
+function aesDecrypt(encrypted:any, key:string) {
+    const decipher = crypto.createDecipher('aes192', key);
+    var decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+}
+
+for (let i = 0; i < connectionData.length; i += 1) {
+  console.log(aesDecrypt(connectionData[i].password, key));
+  connectionData[i].password = aesDecrypt(connectionData[i].password, key);
+};
+// *********************************************
 
 // **************** Layouts ****************
 const { Header, Sider, Content } = Layout;
@@ -73,6 +91,8 @@ export default () => {
   const clearVertexError = () => (document.getElementById("error_vertices") as HTMLElement).innerHTML = "";
 
   const onChangeConnections = (index: any) => {
+    setveLoading(true);
+    setInstalledLoading(true);
     clearInterpretedError();
     clearInstalledError();
     clearVertexError();
@@ -107,20 +127,6 @@ export default () => {
     //Fullfill allVerteices with all type of vertices, push with CheckboxOption type
     //Fullfill allEdges with all type of edges, push with CheckboxOption type
     console.log("Chaning options for Vertices and Edges");
-    if (host == "1"){
-      var tempVerticesData = [];
-      tempVerticesData.push({key: 1, name:"Vertex 1"})
-      tempVerticesData.push({key: 2, name:"Vertex 2"})
-      tempVerticesData.push({key: 3, name:"Vertex 3"})
-      tempVerticesData.push({key: 4, name:"Vertex 4"})
-      setAllVerteices(tempVerticesData);
-
-      var tempEdgesData = [];
-      tempEdgesData.push({key: 1, name:"Edge 1"})
-      tempEdgesData.push({key: 2, name:"Edge 2"})
-      setAllEdges(tempEdgesData);
-    }
-
     conn.getVertexEdgeTypes().then((data) => {
       let edgeTypes = data.edges.name;
       let vertexTypes = data.vertices;
@@ -138,11 +144,14 @@ export default () => {
         edgeRelatedVertex.set(edgeTypes[i], [data.edges.fromVertexType[i], data.edges.toVertexType[i]]);
 
       }
-
+      setveLoading(false);
       setAllVerteices(tempVertexData);
       setAllEdges(tempEdgeData);
 
-    }).catch((err) => (document.getElementById("error_vertices") as HTMLElement).innerHTML = err);
+    }).catch((err) => {
+      setveLoading(false);
+      (document.getElementById("error_vertices") as HTMLElement).innerHTML = err;
+    });
     
     //Fullfill installedQuires with all installed quires, use name as reference (if there are better way change the type of installed quires)
     console.log("Changing options for installed queries");
@@ -153,12 +162,14 @@ export default () => {
       for (let i in arr) {        
         tempInstalledQueryData.push({key: i, name: arr[i], body: arr[i]});
       }
-
-
+      setInstalledLoading(false);
       (document.getElementById("writtenQueriesTextArea") as HTMLInputElement).value = "INTERPRET QUERY () FOR GRAPH "+graphName+" {<br><br>}";
 
       setInstalledQueryData(tempInstalledQueryData);
-    }).catch((err) => (document.getElementById("error_installed") as HTMLElement).innerHTML = err);
+    }).catch((err) => {
+      setInstalledLoading(false);
+      (document.getElementById("error_installed") as HTMLElement).innerHTML = err;
+    });
 
     // if (host == "1"){
     //   var tempInstalledQueryData = [];
@@ -245,6 +256,7 @@ export default () => {
 
   const runSelectedVE = () =>{
     //Get all types of vertix in selectedVertices and all types of edge in selected Edges
+    mainToggle(true);
     console.log(selectedEdgeKeys, selectedVertexKeys)
     createGraph(selectedVertexKeys as string[], selectedEdgeKeys as string[]);
     console.log("Selected Verteices:", selectedVertexKeys);
@@ -264,9 +276,9 @@ export default () => {
     }
   ];
   const chooseInstalledQuery = (gsql:string) => {
+    mainToggle(true);
     clearInstalledError();
     console.log(gsql);
-
     createGraphQuery(gsql);
   }
   // *********************************************
@@ -278,13 +290,29 @@ export default () => {
     var gsql: string;
     gsql = (document.getElementById("writtenQueriesTextArea") as HTMLInputElement).value;
     console.log(gsql);
-
+    mainToggle(true);
     createGraphQueryString(gsql);
 
   };
   // *********************************************
 
-  // ******** FUNCTIONS ***********************
+  // **************** Loading ********************
+  const [mainLoading, setMainLoading] = useState(false);
+  const [veLoading, setveLoading] = useState(false);
+  const [installedLoading, setInstalledLoading] = useState(false);
+
+  const mainToggle = (checked: boolean) => {
+    setMainLoading(checked);
+  };
+  const veToggle = (checked: boolean) => {
+    setveLoading(checked);
+  };
+  const installedToggle = (checked: boolean) => {
+    setInstalledLoading(checked);
+  };
+  // *********************************************
+
+  // ************* FUNCTIONS *********************
 
 
 async function createGraph(v_array: Array<string>, e_array: Array<string>) {
@@ -306,10 +334,14 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
         }
       }
     };
+    mainToggle(false);
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch((err) => (document.getElementById("error_vertices") as HTMLElement).innerHTML = err + "<br><strong>Make sure you selected the source and target vertex types for all the edges!</strong>");
+}).catch((err) => {
+    mainToggle(false);
+    (document.getElementById("error_vertices") as HTMLElement).innerHTML = err + "<br><strong>Make sure you selected the source and target vertex types for all the edges!</strong>";
+  })
 }
 
 async function createGraphQuery(query_name: string) {
@@ -331,10 +363,14 @@ async function createGraphQuery(query_name: string) {
         }
       }
     };
+    mainToggle(false);
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch(err => (document.getElementById("error_installed") as HTMLElement).innerHTML = err+ "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
+}).catch(err => {
+    mainToggle(false);
+    (document.getElementById("error_installed") as HTMLElement).innerHTML = err+ "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>";
+  })
 }
 
 async function createGraphQueryString(query_string: string) {
@@ -351,10 +387,14 @@ async function createGraphQueryString(query_string: string) {
         }
       }
     };
+    mainToggle(false);
     const graph = new Graph(canvas, config);
     graph.setData(x.nodes, x.links);
     graph.zoom(0.9);
-}).catch(err => (document.getElementById("error_interpreted") as HTMLElement).innerHTML = err + "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>");
+}).catch(err => {
+    mainToggle(false);
+    (document.getElementById("error_interpreted") as HTMLElement).innerHTML = err + "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>";
+  })
 }
 
 
@@ -383,9 +423,11 @@ async function createGraphQueryString(query_string: string) {
             <Content
               className="main-layout-content"
             >
-              <ProCard className='main-card'>
-                <canvas style={{width: '100%', height: '100%'}}></canvas>
-              </ProCard>
+              <Spin spinning={mainLoading} delay={500} size='large'>
+                <ProCard className='main-card'>
+                  <canvas style={{width: '100%', height: '100%'}}></canvas>
+                </ProCard>
+              </Spin>
             </Content>
           </Layout>
           <Sider 
@@ -412,104 +454,110 @@ async function createGraphQueryString(query_string: string) {
             <ProCard className='sider-card' title="Cosmograph info">
               <p id = "node_info"></p>
             </ProCard>
-            <ProCard className='sider-card' title="Select Vertex and Edges">
-              <Row>
-                <Col span={12}>
-                  <div>
-                    <span style={{ marginLeft: 8 }}>
-                      {verteicesHasSelected ? `Selected ${selectedVertexKeys.length} vertices` : ''}
-                    </span>
-                  </div>
-                  <Table
-                    scroll={{ y: 200 }}
-                    pagination={false}
-                    size="small"
-                    rowSelection={verteicesSelection}
-                    columns={allVerteicesColumn}
-                    dataSource={allVerteices} />
-                </Col>
-                <Col span={12}>
-                  <div>
-                    <span style={{ marginLeft: 8 }}>
-                      {edgesHasSelected ? `Selected ${selectedEdgeKeys.length} edges` : ''}
-                    </span>
-                  </div>
-                  <Table
-                    scroll={{ y: 200 }}
-                    pagination={false}
-                    size="small"
-                    rowSelection={edgesSelection} 
-                    columns={allEdgesColumn} 
-                    dataSource={allEdges} />
-                </Col>
-              </Row>
-              <Row>
-              <label style={{color: "red", textAlign: "center"}} id = "error_vertices"></label>
-              </Row>
-              <br />
-              <Row>
-                <Col span={8}></Col>
-                <Col span={8}>
-                  <Button
-                    key="render"
-                    type="primary"
-                    onClick={runSelectedVE}
-                    disabled={!verteicesHasSelected || !edgesHasSelected}
-                    shape="round"
-                    block>
-                    Run
-                  </Button>
-                </Col>
-                <Col span={8}></Col>
-              </Row>
-            </ProCard>
-            <ProCard className='sider-card' title="Select Installed Queries">
-              <Table 
-                scroll={{ y: 200 }}
-                pagination={false}
-                size="small"
-                onRow={
-                  (record, index) => {
-                    return{
-                      onClick: event => {
-                        chooseInstalledQuery(record.body);
-                      },
+            <Spin spinning={veLoading} delay={500}>
+              <ProCard className='sider-card' title="Select Vertex and Edges">
+                <Row>
+                  <Col span={12}>
+                    <div>
+                      <span style={{ marginLeft: 8 }}>
+                        {verteicesHasSelected ? `Selected ${selectedVertexKeys.length} vertices` : ''}
+                      </span>
+                    </div>
+                    <Table
+                      scroll={{ y: 200 }}
+                      pagination={false}
+                      size="small"
+                      rowSelection={verteicesSelection}
+                      columns={allVerteicesColumn}
+                      dataSource={allVerteices} />
+                  </Col>
+                  <Col span={12}>
+                    <div>
+                      <span style={{ marginLeft: 8 }}>
+                        {edgesHasSelected ? `Selected ${selectedEdgeKeys.length} edges` : ''}
+                      </span>
+                    </div>
+                    <Table
+                      scroll={{ y: 200 }}
+                      pagination={false}
+                      size="small"
+                      rowSelection={edgesSelection} 
+                      columns={allEdgesColumn} 
+                      dataSource={allEdges} />
+                  </Col>
+                </Row>
+                <Row>
+                <label style={{color: "red", textAlign: "center"}} id = "error_vertices"></label>
+                </Row>
+                <br />
+                <Row>
+                  <Col span={8}></Col>
+                  <Col span={8}>
+                    <Button
+                      key="render"
+                      type="primary"
+                      onClick={runSelectedVE}
+                      disabled={!verteicesHasSelected || !edgesHasSelected}
+                      shape="round"
+                      block>
+                      Run
+                    </Button>
+                  </Col>
+                  <Col span={8}></Col>
+                </Row>
+              </ProCard>
+            </Spin>
+            <Spin spinning={installedLoading} delay={500}>
+              <ProCard className='sider-card' title="Select Installed Queries">
+                <Table 
+                  scroll={{ y: 200 }}
+                  pagination={false}
+                  size="small"
+                  onRow={
+                    (record, index) => {
+                      return{
+                        onClick: event => {
+                          chooseInstalledQuery(record.body);
+                        },
+                      }
                     }
                   }
-                }
-                columns={installedQueryColumns}
-                dataSource={installedQueryData} />
-              <Row>
-              <label style={{color: "red", textAlign: "center"}} id = "error_installed"></label>
-              </Row>
-            </ProCard>
-            <ProCard className='sider-card' title="Write Queries">
-              <TextArea 
-                rows={4}
-                id = "writtenQueriesTextArea"
-                placeholder="Write GSQL queries and hit run button"
-                onChange={clearInterpretedError}></TextArea>
-              <br />
-              <Row>
-              <label style={{color: "red", textAlign: "center"}} id = "error_interpreted"></label>
-              </Row>
-              <br />
-              
-              <Row>
-                <Col span={8}></Col>
-                <Col span={8}>
-                  <Button
-                    key="render"
-                    type="primary"
-                    onClick={runWrittenQuery}
-                    shape="round"
-                    block>
-                    Run
-                  </Button>
-                </Col>
-                <Col span={8}></Col>
-              </Row>
-            </ProCard>
+                  columns={installedQueryColumns}
+                  dataSource={installedQueryData} />
+                <Row>
+                <label style={{color: "red", textAlign: "center"}} id = "error_installed"></label>
+                </Row>
+              </ProCard>
+            </Spin>
+            <Spin spinning={veLoading && installedLoading} delay={500}>
+              <ProCard className='sider-card' title="Write Queries">
+                <TextArea 
+                  rows={4}
+                  id = "writtenQueriesTextArea"
+                  placeholder="Write GSQL queries and hit run button"
+                  onChange={clearInterpretedError}></TextArea>
+                <br />
+                <Row>
+                <label style={{color: "red", textAlign: "center"}} id = "error_interpreted"></label>
+                </Row>
+                <br />
+                
+                <Row>
+                  <Col span={8}></Col>
+                  <Col span={8}>
+                    <Button
+                      key="render"
+                      type="primary"
+                      onClick={runWrittenQuery}
+                      shape="round"
+                      block>
+                      Run
+                    </Button>
+                  </Col>
+                  <Col span={8}></Col>
+                </Row>
+              </ProCard>
+            </Spin>
           </Sider>
         </Layout>
     </ConfigProvider>

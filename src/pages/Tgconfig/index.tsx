@@ -9,6 +9,44 @@ import { Content, Header } from 'antd/lib/layout/layout';
 import Title from 'antd/lib/typography/Title';
 import "./index.css";
 
+const key = "SMDUCA523555AAFFWTSSX6"
+const crypto = require('crypto');
+
+function aesEncrypt(data:any, key:string) {
+    const cipher = crypto.createCipher('aes192', key);
+    var crypted = cipher.update(data, 'utf8', 'hex');
+    crypted += cipher.final('hex');
+    return crypted;
+}
+
+function aesDecrypt(encrypted:any, key:string) {
+    const decipher = crypto.createDecipher('aes192', key);
+    var decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+}
+
+function encrypt_connection_data(connectionData:DataSourceType[]){
+  var encryptedConnectionData: DataSourceType[] = []
+  for (let i = 0; i < connectionData.length; i += 1) {
+    var singleconnection: DataSourceType = connectionData[i];
+    singleconnection.password = aesEncrypt(singleconnection.password, key);
+    encryptedConnectionData.push(singleconnection);
+  };
+  return encryptedConnectionData;
+}
+
+function decrypt_connection_data(encryptedConnectionData:DataSourceType[]){
+  var connectionData: DataSourceType[] = []
+  for (let i = 0; i < encryptedConnectionData.length; i += 1) {
+    var singleconnection: DataSourceType = encryptedConnectionData[i];
+    console.log(aesDecrypt(singleconnection.password, key));
+    singleconnection.password = aesDecrypt(singleconnection.password, key);
+    connectionData.push(singleconnection);
+  };
+  return connectionData;
+}
+
 const waitTime = (time: number = 100) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -26,7 +64,7 @@ type DataSourceType = {
   password?: string;
 };
 
-const defaultData: DataSourceType[] = connectionData
+const defaultData: DataSourceType[] = decrypt_connection_data(connectionData);
 
 async function saveConnectionsToFile(connection_json:any) {
   console.log(connection_json);
@@ -199,7 +237,7 @@ export default () => {
               <Button
                 key="render"
                 type="primary"
-                onClick={() => saveConnectionsToFile(JSON.stringify(dataSource))}
+                onClick={() => saveConnectionsToFile(JSON.stringify(encrypt_connection_data(dataSource)))}
                 shape="round"
                 block>
                 Save
