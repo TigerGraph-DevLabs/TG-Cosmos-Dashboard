@@ -143,9 +143,9 @@ export default () => {
     console.log("Chaning options for Vertices and Edges");
     conn.getVertexEdgeTypes().then((data) => {
       type Edges = {
-        name?: string[];
-        fromVertexType?: string[];
-        toVertexType?: string[];
+        name: string[];
+        fromVertexType: string[];
+        toVertexType: string[];
       };
 
       let edgeTypes = (data.edges as Edges).name;
