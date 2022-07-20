@@ -1,12 +1,7 @@
-import Guide from '@/components/Guide';
-import { trim } from '@/utils/format';
-import { PageContainer } from '@ant-design/pro-components';
-import { useModel } from '@umijs/max';
-import styles from './index.less';
-import { ConfigProvider, Card, Divider, Typography, List} from 'antd';
-import en_US from 'antd/lib/locale/en_US';
+import { Card, Divider, Typography, List} from 'antd';
+import "./index.less";
 
-const { Title, Paragraph, Text, Link } = Typography;
+const { Title } = Typography;
 const data = [
   {
     title: 'Connect to TigerGraph',
@@ -33,7 +28,7 @@ const data = [
 
 export default () => {
   return(
-    <Card style={{ height: 1001, width: 1000 }}>
+    <Card style={{ height: "100vh" }}>
       <Typography>
         <Title>Welcome to TigerGraph Dashboard!</Title>
         <Title level={5}>This page is a guide to show you how to use the dashboard</Title>
