@@ -1,4 +1,4 @@
-import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { ProCard } from '@ant-design/pro-components';
 import { Button, Col, Layout, Row, Select, Spin, Table } from 'antd';
 import connectionData from '../../utils/connections.json'
 import { ConfigProvider } from 'antd';
@@ -142,7 +142,13 @@ export default () => {
     //Fullfill allEdges with all type of edges, push with CheckboxOption type
     console.log("Chaning options for Vertices and Edges");
     conn.getVertexEdgeTypes().then((data) => {
-      let edgeTypes = data.edges.name;
+      type Edges = {
+        name?: string[];
+        fromVertexType?: string[];
+        toVertexType?: string[];
+      };
+
+      let edgeTypes = (data.edges as Edges).name;
       let vertexTypes = data.vertices;
       var tempVertexData = [] as VertexType[];
       var tempEdgeData = [] as EdgeType[];
@@ -153,9 +159,9 @@ export default () => {
       }
 
       for(let i in edgeTypes){
-        vertexRelatedEdge.get(data.edges.fromVertexType[i])?.add(edgeTypes[i]);
-        vertexRelatedEdge.get(data.edges.toVertexType[i])?.add(edgeTypes[i]);
-        edgeRelatedVertex.set(edgeTypes[i], [data.edges.fromVertexType[i], data.edges.toVertexType[i]]);
+        vertexRelatedEdge.get((data.edges as Edges).fromVertexType[i])?.add(edgeTypes[i]);
+        vertexRelatedEdge.get((data.edges as Edges).toVertexType[i])?.add(edgeTypes[i]);
+        edgeRelatedVertex.set(edgeTypes[i], [(data.edges as Edges).fromVertexType[i], (data.edges as Edges).toVertexType[i]]);
 
       }
       setveLoading(false);
@@ -210,7 +216,7 @@ export default () => {
     console.log('selectedRowKeys changed: ', newSelectedVerteicesKeys);
     let tempSet = new Set<string>();
     for(let i in newSelectedVerteicesKeys){
-        vertexRelatedEdge.get(newSelectedVerteicesKeys[i]).forEach((element) => {
+        vertexRelatedEdge.get(newSelectedVerteicesKeys[i] as string).forEach((element) => {
         tempSet.add(element);
       });
     }
@@ -228,7 +234,7 @@ export default () => {
     console.log('selectedRowKeys changed: ', newSelectedEdgesKeys)
     let tempSet = new Set<string>();
     for(let i in newSelectedEdgesKeys){
-      edgeRelatedVertex.get(newSelectedEdgesKeys[i])?.forEach((v) => {
+      edgeRelatedVertex.get(newSelectedEdgesKeys[i] as string)?.forEach((v) => {
         tempSet.add(v);
       })
     }
