@@ -18,21 +18,33 @@ import {
 } from '@ant-design/icons';
 
 // **************** Encryption ****************
+const CryptoJS = require('crypto-js');
+const key = 'TGCOSPASS';
 
-const key = "SMDUCA523555AAFFWTSSX6"
-const crypto = require('crypto');
+const decrypt = (data:any) => {
+  var reb64 = CryptoJS.enc.Hex.parse(data);
+  var bytes = reb64.toString(CryptoJS.enc.Base64);
+  var decrypt = CryptoJS.AES.decrypt(bytes, key);
+  var plain = decrypt.toString(CryptoJS.enc.Utf8);
+  return plain;
+};
 
-function aesDecrypt(encrypted:any, key:string) {
-    const decipher = crypto.createDecipher('aes192', key);
-    var decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+function decrypt_connection_data(encryptedConnectionData:any){
+  var connectionData: any[] = []
+  //Colen the array
+  encryptedConnectionData.forEach((val: any) => connectionData.push(Object.assign({}, val)));
+  for (let i = 0; i < connectionData.length; i += 1) {
+    // console.log("Before decrypt: ", connectionData[i].password);
+    connectionData[i].password = decrypt(connectionData[i].password);
+    // console.log("After decrypt: ", connectionData[i].password);
+  };
+  return connectionData;
 }
 
-for (let i = 0; i < connectionData.length; i += 1) {
-  console.log(aesDecrypt(connectionData[i].password, key));
-  connectionData[i].password = aesDecrypt(connectionData[i].password, key);
-};
+const decryptedConnectionData = decrypt_connection_data(connectionData);
+// console.log(connectionData);
+// console.log(decryptedConnectionData);
+
 // *********************************************
 
 // **************** Layouts ****************
@@ -99,14 +111,16 @@ export default () => {
     //When user change the options for connections
     connectionIndex = index;
     console.log(`selected ${index}`);
-    testConnection(connectionData[index].host,
-      connectionData[index].graphName,
-      connectionData[index].userName,
-      connectionData[index].password);
-    initConnections(connectionData[index].host,
-      connectionData[index].graphName,
-      connectionData[index].userName,
-      connectionData[index].password);
+    var host = decryptedConnectionData[index].host;
+    var graphName = decryptedConnectionData[index].graphName;
+    var userName = decryptedConnectionData[index].userName;
+    var password = decryptedConnectionData[index].password;
+    console.log("host: ", host);
+    console.log("graphName: ", graphName);
+    console.log("userName: ", userName);
+    console.log("password: ", password);
+    testConnection(host,graphName,userName,password);
+    initConnections(host,graphName,userName,password);
   };
 
   async function testConnection(host:string, graphName:string, userName:string, password:string) {
