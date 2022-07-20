@@ -25,3 +25,6 @@ Ant Design Pro is a production-ready solution for enterprise applications as a R
 ### Run Dashboard
 1. Install the packages: `yarn`
 2. Start the dashboard: `yarn start`
+
+### NPM install:
+1. Install crypto-js: npm install crypto-js

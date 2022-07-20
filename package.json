@@ -15,6 +15,7 @@
     "antd": "^4.20.7",
     "browserify-fs": "^1.0.0",
     "btoa": "^1.2.1",
+    "crypto-js": "^4.1.1",
     "react": "^18.2.0"
   },
   "devDependencies": {
@@ -24,6 +25,7 @@
     "prettier": "^2",
     "prettier-plugin-organize-imports": "^2",
     "prettier-plugin-packagejson": "^2",
-    "typescript": "^4.1.2"
+    "typescript": "^4.1.2",
+    "umi-plugin-react": "^1.15.9"
   }
 }

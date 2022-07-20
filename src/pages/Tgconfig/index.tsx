@@ -9,40 +9,44 @@ import { Content, Header } from 'antd/lib/layout/layout';
 import Title from 'antd/lib/typography/Title';
 import "./index.css";
 
-const key = "SMDUCA523555AAFFWTSSX6"
-const crypto = require('crypto');
+const CryptoJS = require('crypto-js');
+const key = 'TGCOSPASS';
 
-function aesEncrypt(data:any, key:string) {
-    const cipher = crypto.createCipher('aes192', key);
-    var crypted = cipher.update(data, 'utf8', 'hex');
-    crypted += cipher.final('hex');
-    return crypted;
-}
+const encrypt = (text:any) => {
+  var b64 = CryptoJS.AES.encrypt(text, key).toString();
+  var e64 = CryptoJS.enc.Base64.parse(b64);
+  var eHex = e64.toString(CryptoJS.enc.Hex);
+  return eHex;
+};
 
-function aesDecrypt(encrypted:any, key:string) {
-    const decipher = crypto.createDecipher('aes192', key);
-    var decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
-}
+const decrypt = (data:any) => {
+  var reb64 = CryptoJS.enc.Hex.parse(data);
+  var bytes = reb64.toString(CryptoJS.enc.Base64);
+  var decrypt = CryptoJS.AES.decrypt(bytes, key);
+  var plain = decrypt.toString(CryptoJS.enc.Utf8);
+  return plain;
+};
 
-function encrypt_connection_data(connectionData:DataSourceType[]){
-  var encryptedConnectionData: DataSourceType[] = []
-  for (let i = 0; i < connectionData.length; i += 1) {
-    var singleconnection: DataSourceType = connectionData[i];
-    singleconnection.password = aesEncrypt(singleconnection.password, key);
-    encryptedConnectionData.push(singleconnection);
+function encrypt_connection_data(connectionData:any){
+  var encryptedConnectionData: any[] = []
+  //Colen the array
+  connectionData.forEach((val: any) => encryptedConnectionData.push(Object.assign({}, val)));
+  for (let i = 0; i < encryptedConnectionData.length; i += 1) {
+    // console.log("Before encrypt: ", encryptedConnectionData[i].password);
+    encryptedConnectionData[i].password = encrypt(encryptedConnectionData[i].password);
+    // console.log("After encrypt: ", encryptedConnectionData[i].password);
   };
   return encryptedConnectionData;
 }
 
-function decrypt_connection_data(encryptedConnectionData:DataSourceType[]){
-  var connectionData: DataSourceType[] = []
-  for (let i = 0; i < encryptedConnectionData.length; i += 1) {
-    var singleconnection: DataSourceType = encryptedConnectionData[i];
-    console.log(aesDecrypt(singleconnection.password, key));
-    singleconnection.password = aesDecrypt(singleconnection.password, key);
-    connectionData.push(singleconnection);
+function decrypt_connection_data(encryptedConnectionData:any){
+  var connectionData: any[] = []
+  //Colen the array
+  encryptedConnectionData.forEach((val: any) => connectionData.push(Object.assign({}, val)));
+  for (let i = 0; i < connectionData.length; i += 1) {
+    // console.log("Before decrypt: ", connectionData[i].password);
+    connectionData[i].password = decrypt(connectionData[i].password);
+    // console.log("After decrypt: ", connectionData[i].password);
   };
   return connectionData;
 }
@@ -64,7 +68,10 @@ type DataSourceType = {
   password?: string;
 };
 
+// const defaultData: DataSourceType[] = connectionData;
 const defaultData: DataSourceType[] = decrypt_connection_data(connectionData);
+// console.log(connectionData);
+// console.log(defaultData);
 
 async function saveConnectionsToFile(connection_json:any) {
   console.log(connection_json);
@@ -79,10 +86,8 @@ async function saveConnectionsToFile(connection_json:any) {
     console.log("Fetch Succeed");
     if (!response.ok) {
       message.error('Fail to save the file, an error happened at FASTAPI');
-      return;
     }
     message.success('Save succeed');
-    return;
   } catch (error) {
     message.error('Fail to save, connection issue happened');
     if (error instanceof Error) {
@@ -245,9 +250,7 @@ export default () => {
             </Col>
             <Col span={10}></Col>
           </Row>
-        </Content>
-      </Layout>
-        {/* <ProCard title="Table Data (Delete this part after complete)" headerBordered collapsible defaultCollapsed>
+          <ProCard title="Table Data (Delete this part after complete)" headerBordered collapsible defaultCollapsed>
           <ProFormField
             ignoreFormItem
             fieldProps={{
@@ -259,7 +262,10 @@ export default () => {
             valueType="jsonCode"
             text={JSON.stringify(dataSource)}
           />
-        </ProCard> */}
+        </ProCard>
+        </Content>
+      </Layout>
+        
     </ConfigProvider>
   );
 };
