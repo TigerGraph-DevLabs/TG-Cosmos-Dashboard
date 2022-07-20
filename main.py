@@ -80,6 +80,7 @@ async def get_vertex_edge_types():
 async def get_vertex_edge_types(v: Union[List[str], None] = Query(default=None), e: Union[List[str], None] = Query(default=None)):
     global CONN
     print(v, e)
+    if "*" in v: v.remove("*")
     s = (f"INTERPRET QUERY () FOR GRAPH {CONN.graphname} "
     "{     ListAccum<EDGE> @@edges;"
     "      Seed = { "
