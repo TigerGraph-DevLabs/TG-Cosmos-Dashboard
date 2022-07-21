@@ -216,53 +216,53 @@ export default () => {
                   },
                 ]}
               />
-            ]}
-            columns={columns}
-            request={async () => ({
-              data: defaultData,
-              total: 3,
-              success: true,
-            })}
-            value={dataSource}
-            onChange={setDataSource}
-            editable={{
-              type: 'multiple',
-              editableKeys,
-              onSave: async (rowKey, data, row) => {
-                console.log(rowKey, data, row);
-                await waitTime(2000);
-              },
-              onChange: setEditableRowKeys,
-            }}
-          />
-          <br />
-          <Row>
-            <Col span={10}></Col>
-            <Col span={4}>
-              <Button
-                key="render"
-                type="primary"
-                onClick={() => saveConnectionsToFile(JSON.stringify(encrypt_connection_data(dataSource)))}
-                shape="round"
-                block>
-                Save
-              </Button>
-            </Col>
-            <Col span={10}></Col>
-          </Row>
-          <ProCard title="Table Data (Delete this part after complete)" headerBordered collapsible defaultCollapsed>
-          <ProFormField
-            ignoreFormItem
-            fieldProps={{
-              style: {
-                width: '100%',
-              },
-            }}
-            mode="read"
-            valueType="jsonCode"
-            text={JSON.stringify(dataSource)}
-          />
-        </ProCard>
+              ]}
+              columns={columns}
+              request={async () => ({
+                data: defaultData,
+                total: 3,
+                success: true,
+              })}
+              value={dataSource}
+              onChange={setDataSource}
+              editable={{
+                type: 'multiple',
+                editableKeys,
+                onSave: async (rowKey, data, row) => {
+                  console.log(rowKey, data, row);
+                  await waitTime(2000);
+                },
+                onChange: setEditableRowKeys,
+              }}
+            />
+            <br />
+            <Row>
+              <Col span={10}></Col>
+              <Col span={4}>
+                <Button
+                  key="render"
+                  type="primary"
+                  onClick={() => saveConnectionsToFile(JSON.stringify(encrypt_connection_data(dataSource)))}
+                  shape="round"
+                  block>
+                  Save
+                </Button>
+              </Col>
+              <Col span={10}></Col>
+            </Row>
+            {/* <ProCard title="Table Data (Delete this part after complete)" headerBordered collapsible defaultCollapsed>
+            <ProFormField
+              ignoreFormItem
+              fieldProps={{
+                style: {
+                  width: '100%',
+                },
+              }}
+              mode="read"
+              valueType="jsonCode"
+              text={JSON.stringify(dataSource)}
+            />
+          </ProCard> */}
         </Content>
       </Layout>
         

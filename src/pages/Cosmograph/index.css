@@ -12,7 +12,7 @@
 }
 
 .trigger:hover {
-  color: #1890ff;
+  color: #FF6D00 !important;
 }
   
 .main-layout {
@@ -26,6 +26,7 @@
 
 .main-layout-content {
   background: #0D0D0D;
+  height:100%;
 }
 
 .sider {
@@ -48,7 +49,7 @@
 .main-card {
   margin-left: 2%;
   width: 96%;
-  height: 96%;
+  height: 90vh;
   background:#222222;
 }
 
