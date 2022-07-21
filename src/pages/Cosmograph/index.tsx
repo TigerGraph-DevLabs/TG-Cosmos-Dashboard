@@ -474,6 +474,58 @@ async function createGraphQueryString(query_string: string) {
             <ProCard className='sider-card' title="Cosmograph info">
               <p id = "node_info"></p>
             </ProCard>
+           
+            <Spin spinning={installedLoading} delay={500}>
+              <ProCard className='sider-card' title="Select Installed Queries">
+                <Table 
+                  scroll={{ y: 200 }}
+                  pagination={false}
+                  size="small"
+                  onRow={
+                    (record, index) => {
+                      return{
+                        onClick: event => {
+                          chooseInstalledQuery(record.body);
+                        },
+                      }
+                    }
+                  }
+                  columns={installedQueryColumns}
+                  dataSource={installedQueryData} />
+                <Row>
+                <label style={{color: "red", textAlign: "center"}} id = "error_installed"></label>
+                </Row>
+              </ProCard>
+            </Spin>
+            <Spin spinning={veLoading && installedLoading} delay={500}>
+              <ProCard className='sider-card' title="Write Queries">
+                <TextArea 
+                  rows={4}
+                  id = "writtenQueriesTextArea"
+                  placeholder="Write GSQL queries and hit run button"
+                  onChange={clearInterpretedError}></TextArea>
+                <br />
+                <Row>
+                <label style={{color: "red", textAlign: "center"}} id = "error_interpreted"></label>
+                </Row>
+                <br />
+                
+                <Row>
+                  <Col span={8}></Col>
+                  <Col span={8}>
+                    <Button
+                      key="render"
+                      type="primary"
+                      onClick={runWrittenQuery}
+                      shape="round"
+                      block>
+                      Run
+                    </Button>
+                  </Col>
+                  <Col span={8}></Col>
+                </Row>
+              </ProCard>
+            </Spin>
             <Spin spinning={veLoading} delay={500}>
               <ProCard className='sider-card' title="Select Vertex and Edges">
                 <Row>
@@ -518,57 +570,6 @@ async function createGraphQueryString(query_string: string) {
                       type="primary"
                       onClick={runSelectedVE}
                       disabled={!verteicesHasSelected || !edgesHasSelected}
-                      shape="round"
-                      block>
-                      Run
-                    </Button>
-                  </Col>
-                  <Col span={8}></Col>
-                </Row>
-              </ProCard>
-            </Spin>
-            <Spin spinning={installedLoading} delay={500}>
-              <ProCard className='sider-card' title="Select Installed Queries">
-                <Table 
-                  scroll={{ y: 200 }}
-                  pagination={false}
-                  size="small"
-                  onRow={
-                    (record, index) => {
-                      return{
-                        onClick: event => {
-                          chooseInstalledQuery(record.body);
-                        },
-                      }
-                    }
-                  }
-                  columns={installedQueryColumns}
-                  dataSource={installedQueryData} />
-                <Row>
-                <label style={{color: "red", textAlign: "center"}} id = "error_installed"></label>
-                </Row>
-              </ProCard>
-            </Spin>
-            <Spin spinning={veLoading && installedLoading} delay={500}>
-              <ProCard className='sider-card' title="Write Queries">
-                <TextArea 
-                  rows={4}
-                  id = "writtenQueriesTextArea"
-                  placeholder="Write GSQL queries and hit run button"
-                  onChange={clearInterpretedError}></TextArea>
-                <br />
-                <Row>
-                <label style={{color: "red", textAlign: "center"}} id = "error_interpreted"></label>
-                </Row>
-                <br />
-                
-                <Row>
-                  <Col span={8}></Col>
-                  <Col span={8}>
-                    <Button
-                      key="render"
-                      type="primary"
-                      onClick={runWrittenQuery}
                       shape="round"
                       block>
                       Run
