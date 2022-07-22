@@ -147,7 +147,7 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
         });
     }
 
-    async runQuery(query_name: string, params?: JSON) : Promise<{ nodes: N[]; links: L[]; }> {
+    async runQuery(query_name: string, params?: JSON) : Promise<{ nodes: N[]; links: L[]; } | { data: string }> {
         return fetch(`http://127.0.0.1:8010/installedQuery/${query_name}`, {
             method: 'GET'
             // body: params ? JSON.stringify(params) : "{}",
@@ -181,13 +181,22 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
                     }
                 }
             }
-            if (nodes.length === 0) {
-                throw new Error("No vertices detected");
-            } else if (links.length === 0) {
-                throw new Error("No edges detected");
+            if (links.length === 0 && nodes.length > 0) {
+                return {"data": data}
+            } 
+            
+            if (nodes.length === 0 && links.length > 0) {
+                for (let edge in links) {
+                    nodes.push({id: `${links[edge].from_type}_${links[edge].from_id}`, v_id: `${links[edge].from_id}`, v_type: `${links[edge].from_type}`});
+                    nodes.push({id: `${links[edge].to_type}_${links[edge].to_id}`, v_id: `${links[edge].to_id}`, v_type: `${links[edge].to_type}`});
+                }
+            } 
+            
+            if (nodes.length === 0 && links.length === 0) {
+                return {"data": data ? data : ""};
             }
             return {"nodes": nodes, "links": links};
-        });
+        }).catch((err) => {throw Error(err)});
     }
 
     // async runInstalledQuery(query_name: string, params?: JSON) : Promise<{ nodes: N[]; links: L[]; }> {

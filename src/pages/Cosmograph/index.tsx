@@ -219,7 +219,7 @@ export default () => {
     console.log('selectedRowKeys changed: ', newSelectedVerteicesKeys);
     let tempSet = new Set<string>();
     for(let i in newSelectedVerteicesKeys){
-        vertexRelatedEdge.get(newSelectedVerteicesKeys[i] as string).forEach((element) => {
+        vertexRelatedEdge?.get(newSelectedVerteicesKeys[i] as string).forEach((element) => {
         tempSet.add(element);
       });
     }
@@ -389,30 +389,36 @@ async function createGraph(v_array: Array<string>, e_array: Array<string>) {
 
 async function createGraphQuery(query_name: string) {
   conn.runQuery(query_name).then((x) => {
-    const type_to_colour : Map<string, string> = new Map();
+    console.log(x);
+    console.log(x.data);
+    if (x.data) {
+      (document.getElementById("node_info") as HTMLElement).innerHTML = "<pre style='white-space: pre-wrap;'>"+JSON.stringify(x.data, null, "<br>") + "</pre>";
+      mainToggle(false);
+    } else {
 
-  //   for (let v in v_array) {
-  //     type_to_colour.set(v_array[v], 'rgb('+Math.round(Math.random()*255)+','+Math.round(Math.random()*255)+','+Math.round(Math.random()*255)+')');
-  //   }
-
-    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
-    const config: GraphConfigInterface<InputNode, InputLink> = {
-      // nodeColor: v => `${type_to_colour.get("" + v.v_type)}`,
-      linkArrows: false,
-      events: {
-        onClick: (node) => {
-          console.log("Clicked node: ", node);
-          (document.getElementById("node_info") as HTMLElement).innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
-        }
-      }
-    };
-    mainToggle(false);
-    const graph = new Graph(canvas, config);
-    graph.setData(x.nodes, x.links);
-    graph.zoom(0.9);
+      //   for (let v in v_array) {
+      //     type_to_colour.set(v_array[v], 'rgb('+Math.round(Math.random()*255)+','+Math.round(Math.random()*255)+','+Math.round(Math.random()*255)+')');
+      //   }
+    
+        const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+        const config: GraphConfigInterface<InputNode, InputLink> = {
+          // nodeColor: v => `${type_to_colour.get("" + v.v_type)}`,
+          linkArrows: false,
+          events: {
+            onClick: (node) => {
+              console.log("Clicked node: ", node);
+              (document.getElementById("node_info") as HTMLElement).innerHTML = node ? "<pre style='white-space: pre-wrap;'>"+JSON.stringify(node, null, "<br>") + "</pre>" : "";
+            }
+          }
+        };
+        mainToggle(false);
+        const graph = new Graph(canvas, config);
+        graph.setData(x.nodes, x.links);
+        graph.zoom(0.9);
+    }
 }).catch(err => {
     mainToggle(false);
-    (document.getElementById("error_installed") as HTMLElement).innerHTML = err+ "<br><strong>Make sure the query includes lists or sets of both vertices and edges!</strong>";
+    (document.getElementById("error_installed") as HTMLElement).innerHTML = err+ "<br><strong>Make sure your query does not require parameters!</strong>";
   })
 }
 
