@@ -370,6 +370,7 @@ async function createGraphQuery(query_name: string) {
     console.log(x.data);
     if (x.data) {
       (document.getElementById("node_info") as HTMLElement).innerHTML = "<pre style='white-space: pre-wrap;'>"+JSON.stringify(x.data, null, "<br>") + "</pre>";
+      mainToggle(false);
     } else {
 
       //   for (let v in v_array) {
