@@ -25,6 +25,12 @@ app.add_middleware(
 class Data(BaseModel):
     query: str
 
+class VertexTypeModel(BaseModel):
+    VertexTypes: list = []
+
+class EdgeTypeModel(BaseModel):
+    EdgeType: str
+
 CONN = False
 
 @app.post("/interpretedQuery")
@@ -75,6 +81,22 @@ async def get_vertex_edge_types():
         e["toVertexType"].append(i["ToVertexTypeName"])
     
     return {"v": v, "e": e}
+
+@app.post("/getVertexCount")
+async def get_vertex_count(input: VertexTypeModel):
+    global CONN
+    vTypes = input.VertexTypes
+    vCount = CONN.getVertexCount(vTypes)
+    return vCount
+
+@app.post("/getEdgeCount")
+async def get_edge_count(input: EdgeTypeModel):
+    global CONN
+    eType = input.EdgeType
+    eCount = CONN.getEdgeCount(eType)
+    print(eCount)
+    return eCount
+    
 
 @app.get("/getVertexEdgeData")
 async def get_vertex_edge_types(v: Union[List[str], None] = Query(default=None), e: Union[List[str], None] = Query(default=None)):

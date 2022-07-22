@@ -241,5 +241,59 @@ export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
     //     } else return this.getVertexEdgeTypes();
 
     // }
+
+    async getVertexCount(data={}): Promise<{}>{
+
+        return fetch(`http://127.0.0.1:8010/getVertexCount`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+        
+            return response.json();
+        }).then(data => {
+            console.log(data);
+            
+            
+            return data;
+        })
+    }
+
+    async getEdgeCount(data={}): Promise<number>{
+
+        return fetch(`http://127.0.0.1:8010/getEdgeCount`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+        
+            return response.json();
+        }).then(data => {            
+            return data;
+        })
+    }
+
+    async getAllEdgeCount(allEdges: string[]): Promise<number>{
+        let sum = 0;
+        for(let i in allEdges){
+            let count = await this.getEdgeCount({EdgeType: allEdges[i]});
+            sum += count
+
+        }
+        return sum;
+
+    }
+    
+
     
 }
