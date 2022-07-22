@@ -209,6 +209,9 @@ export default () => {
   const [selectedVertexKeys, setSelectedVerteicesKeys] = useState<React.Key[]>([]);
   const [selectedEdgeKeys, setSelectedEdgesKeys] = useState<React.Key[]>([]);
 
+  const [selectedVertexCount, setSelectedVertexCount] = useState<number>();
+  const [selectedEdgeCount, setSelectedEdgeCount] = useState<number>();
+
   const onVerteicesSelectChange = (newSelectedVerteicesKeys: React.Key[]) => {
     clearVertexError();
     //console.log('selectedRowKeys changed: ', selectedVertexKeys);
@@ -224,6 +227,18 @@ export default () => {
     tempSet.forEach((s) => {
       edgetypes.push({key: s, name: s})
     })
+    
+    conn.getVertexCount({VertexTypes: newSelectedVerteicesKeys as string[]}).then(
+      (res) => {
+        let sum = 0;
+        for (let key in res) {
+          let value = res[key];
+          sum += value;
+        }
+        setSelectedVertexCount(sum);
+
+      }
+    )
     setAllEdges(edgetypes);
 
   };
@@ -243,6 +258,14 @@ export default () => {
     tempSet.forEach((s) => {
       vertexTypes.push(s);
     })
+    conn.getAllEdgeCount(newSelectedEdgesKeys as string[]).then(
+      (sum) => {
+        setSelectedEdgeCount(sum);
+        console.log(sum)
+
+      }
+    )
+    
     setSelectedVerteicesKeys(vertexTypes);
 
 
@@ -262,14 +285,14 @@ export default () => {
 
   const allVerteicesColumn: ColumnsType<VertexType> = [
     {
-      title: "Vertex name",
+      title: "Vertex type",
       dataIndex:"name",
     }
   ];
 
   const allEdgesColumn: ColumnsType<EdgeType> = [
     {
-      title: "Edge name",
+      title: "Edge type",
       dataIndex:"name",
     }
   ];
@@ -480,7 +503,7 @@ async function createGraphQueryString(query_string: string) {
                   <Col span={12}>
                     <div>
                       <span style={{ marginLeft: 8 }}>
-                        {verteicesHasSelected ? `Selected ${selectedVertexKeys.length} vertices` : ''}
+                        {verteicesHasSelected ? `Selected ${selectedVertexCount} vertices` : ''}
                       </span>
                     </div>
                     <Table
@@ -494,7 +517,7 @@ async function createGraphQueryString(query_string: string) {
                   <Col span={12}>
                     <div>
                       <span style={{ marginLeft: 8 }}>
-                        {edgesHasSelected ? `Selected ${selectedEdgeKeys.length} edges` : ''}
+                        {edgesHasSelected ? `Selected ${selectedEdgeCount} edges` : ''}
                       </span>
                     </div>
                     <Table
