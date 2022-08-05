@@ -1,5 +1,7 @@
 # Tigergraph + CosmoGraph Dashboard
 A dashboard for visualizing Tigergraph data using CosmoGraph
+![image](https://user-images.githubusercontent.com/98365404/183126655-136e667d-d98f-4e11-b7fc-fa9c5a439ca2.png)
+
 ## Cosmos
 Cosmos is a WebGL Force Graph layout algorithm and rendering engine. All the computations and drawing are happening on the GPU in fragment and vertex shaders avoiding expensive memory operations.
 It enables real-time simulation of network graphs consisting of hundreds of thousands of nodes and edges on modern hardware.
