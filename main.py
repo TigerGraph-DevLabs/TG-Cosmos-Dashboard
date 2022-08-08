@@ -41,10 +41,10 @@ async def interpreted_query(query: Data):
     return {"results": res}
 
 @app.get("/createConnection")
-async def create_connection(host, graphname, username, password):
+async def create_connection(host, graphname, secret):
     global CONN
-    CONN = tg.TigerGraphConnection(host, graphname, username=username, password=password)
-    CONN.apiToken = CONN.getToken(CONN.createSecret())
+    CONN = tg.TigerGraphConnection(host=host, graphname=graphname, gsqlSecret=secret)
+    CONN.apiToken = CONN.getToken(secret)
     print(CONN)
     return "Success!"
 

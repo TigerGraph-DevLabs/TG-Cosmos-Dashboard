@@ -34,16 +34,12 @@ function decrypt_connection_data(encryptedConnectionData:any){
   //Colen the array
   encryptedConnectionData.forEach((val: any) => connectionData.push(Object.assign({}, val)));
   for (let i = 0; i < connectionData.length; i += 1) {
-    // console.log("Before decrypt: ", connectionData[i].password);
-    connectionData[i].password = decrypt(connectionData[i].password);
-    // console.log("After decrypt: ", connectionData[i].password);
+    connectionData[i].secret = decrypt(connectionData[i].secret);
   };
   return connectionData;
 }
 
 const decryptedConnectionData = decrypt_connection_data(connectionData);
-// console.log(connectionData);
-// console.log(decryptedConnectionData);
 
 // *********************************************
 
@@ -113,21 +109,14 @@ export default () => {
     console.log(`selected ${index}`);
     var host = decryptedConnectionData[index].host;
     var graphName = decryptedConnectionData[index].graphName;
-    var userName = decryptedConnectionData[index].userName;
-    var password = decryptedConnectionData[index].password;
+    var secret = decryptedConnectionData[index].secret;
     console.log("host: ", host);
     console.log("graphName: ", graphName);
-    console.log("userName: ", userName);
-    console.log("password: ", password);
-    testConnection(host,graphName,userName,password);
-    initConnections(host,graphName,userName,password);
+    console.log("secret: ", secret);
+    initConnections(host,graphName,secret);
   };
 
-  async function testConnection(host:string, graphName:string, userName:string, password:string) {
-    console.log(host,graphName,userName,password);
-  };
-
-  const initConnections = (host: string, graphName: string, userName: string, password: string) => {
+  const initConnections = (host: string, graphName: string, secret: string) => {
     //Empty everything fist
     var tempEmpty: any = [];
     setInstalledQueryData(tempEmpty);
@@ -135,7 +124,7 @@ export default () => {
     setAllEdges(tempEmpty);
 
     //make connection to tg cloud
-    conn = new TigerGraphConnection(host, graphName, userName, password);
+    conn = new TigerGraphConnection(host, graphName, secret);
     conn.createConnection().then(() => {
     //Make Connections with TG Cloud and Get all type of verteices/edges and installed queries
     //Fullfill allVerteices with all type of vertices, push with CheckboxOption type

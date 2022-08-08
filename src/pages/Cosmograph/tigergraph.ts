@@ -17,40 +17,18 @@ export type InputLink = {
 export class TigerGraphConnection<N extends InputNode, L extends InputLink> {
   host: string;
   graphname: string;
-  username: string;
-  password: string;
+  secret: string;
   token: string;
  
-  constructor(host: string, graphname: string, username: string, password: string, token?: string) {
+  constructor(host: string, graphname: string, secret: string, token?: string) {
     this.host = host;
     this.graphname = graphname;
-    this.username = username;
-    this.password = password;
+    this.secret = secret;
     this.token = token ? token : "";
   }
 
-//   async generateToken() {
-//     return fetch(`${this.host}:9000/requesttoken`, {
-//         method: 'POST',
-//         body: `{"graph": "${this.graphname}"}`,
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': 'Basic '+btoa(`${this.username}:${this.password}`),
-//         }
-//     }).then(response => {
-//         if (!response.ok) {
-//             throw new Error(`Error! status: ${response.status}`);
-//         }
-    
-//         return response.json();
-//     }).then(data => {
-//         this.token = data.results.token;
-//         return this.token;
-//     });
-//   }
-
   async createConnection() {
-    return fetch(`http://127.0.0.1:8010/createConnection?host=${this.host}&graphname=${this.graphname}&username=${this.username}&password=${this.password}`, {
+    return fetch(`http://127.0.0.1:8010/createConnection?host=${this.host}&graphname=${this.graphname}&secret=${this.secret}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
