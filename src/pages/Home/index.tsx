@@ -5,7 +5,10 @@ const { Title } = Typography;
 const data = [
   {
     title: 'Connect to TigerGraph',
-    desc: 'Go to TigerGraph Configuration page. Add nickname, host, graphname, username and password of your solution and save.'
+    desc: 'Go to TigerGraph Configuration page. Add nickname, host, graphname, and secret of your solution and save. '
+  },
+  {
+    desc: 'To generate the secret, go to AdminPortal -> Management -> Users -> Click + to add a new secret'
   },
   {
     title: 'Visualize your data',
