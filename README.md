@@ -29,5 +29,5 @@ Ant Design Pro is a production-ready solution for enterprise applications as a R
 3. Run the server: `python main.py`
 
 ### Run Dashboard
-1. Install the packages: `yarn`
+1. Install the packages: `yarn install`
 2. Start the dashboard: `yarn start`
