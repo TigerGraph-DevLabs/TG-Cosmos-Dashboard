@@ -11,7 +11,8 @@ const data = [
     title: 'Visualize your data',
     desc: 'Go to Cosmograph Visualization page. Select a connection.\
     You can select the vertices and edges from your schema, or select an installed query for data visualization.\
-    You can also write an intepreted query by yourself!'
+    You can also write an intepreted query by yourself!\
+    The interpreted and installed queries must have an edge list or set and can optionally also have a vertex list or set to be visualized.'
   },
   {
     title: 'Enable hardware acceleration',
