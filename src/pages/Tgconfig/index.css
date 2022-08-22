@@ -28,17 +28,3 @@
 .connection-table-thead > tr > th{
   background: #2F3032 !important;
 }
-
-::-webkit-scrollbar {
-  height: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: grey; 
-  border-radius: 5px;
-}
-.list_container {
-    overflow:auto;
-    height: 50px;
-    width: 40px;
-}

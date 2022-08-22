@@ -32,7 +32,9 @@ function encrypt_connection_data(connectionData:any){
   //Colen the array
   connectionData.forEach((val: any) => encryptedConnectionData.push(Object.assign({}, val)));
   for (let i = 0; i < encryptedConnectionData.length; i += 1) {
-    encryptedConnectionData[i].secret = encrypt(encryptedConnectionData[i].secret);
+    // console.log("Before encrypt: ", encryptedConnectionData[i].password);
+    encryptedConnectionData[i].password = encrypt(encryptedConnectionData[i].password);
+    // console.log("After encrypt: ", encryptedConnectionData[i].password);
   };
   return encryptedConnectionData;
 }
@@ -42,7 +44,9 @@ function decrypt_connection_data(encryptedConnectionData:any){
   //Colen the array
   encryptedConnectionData.forEach((val: any) => connectionData.push(Object.assign({}, val)));
   for (let i = 0; i < connectionData.length; i += 1) {
-    connectionData[i].secret = decrypt(connectionData[i].secret);
+    // console.log("Before decrypt: ", connectionData[i].password);
+    connectionData[i].password = decrypt(connectionData[i].password);
+    // console.log("After decrypt: ", connectionData[i].password);
   };
   return connectionData;
 }
@@ -60,7 +64,8 @@ type DataSourceType = {
   nickName?: string;
   host?: string;
   graphName?: string;
-  secret?: string;
+  userName?: string;
+  password?: string;
 };
 
 // const defaultData: DataSourceType[] = connectionData;
@@ -110,13 +115,13 @@ export default () => {
           rules: rowIndex > 1 ? [{ required: true, message: 'Required' }] : [],
         };
       },
-      width: '12%',
+      width: '18%',
     },
     {
       title: 'Host',
       dataIndex: 'host',
       tooltip: 'Domain of Graph Studio',
-      width: '20%',
+      width: '25%',
     },
     {
       title: 'Graphname',
@@ -124,10 +129,15 @@ export default () => {
       width: '12%',
     },
     {
-      title: 'Secret',
-      dataIndex: 'secret',
+      title: 'Username',
+      dataIndex: 'userName',
+      width: '12%',
+    },
+    {
+      title: 'Password',
+      dataIndex: 'password',
       valueType: 'password',
-      width: '24%',
+      width: '12%',
     },
     {
       title: 'Options',
