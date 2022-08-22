@@ -17,7 +17,7 @@ Ant Design Pro is a production-ready solution for enterprise applications as a R
 [Ant Design Pro](https://pro.ant.design/docs/getting-started/)
 
 ## Quick start
-> Note: your Node version MUST be 14 or above except 15 and 17. Check your node version using `node -v`. If needed, download Node using Brew (`brew install node`) or update Node using [nvm](https://github.com/nvm-sh/nvhttps://github.com/nvm-sh/nvm).
+> Note: your Node version MUST be 14 or above except 15 and 17. Check your node version using `node -v`. If needed, download Node using [Brew](https://brew.sh/) (`brew install node`) or update Node using [nvm](https://github.com/nvm-sh/nvhttps://github.com/nvm-sh/nvm).
 
 ### Clone the Repository
 1. Clone this repository: `git clone https://github.com/TigerGraph-DevLabs/TG-Cosmos-Dashboard.git`
